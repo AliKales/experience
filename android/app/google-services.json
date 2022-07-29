@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "923409036548",
+    "project_id": "experiences-9cd40",
+    "storage_bucket": "experiences-9cd40.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923409036548:android:1b1778d0d846832ac90c51",
+        "android_client_info": {
+          "package_name": "com.companyname.packagename.experiences"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "923409036548-k77t6259hbkuqll06d4fidis8547k33h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkNcwtUD2J9mCFeZDsHboQyfdbGjlZqvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "923409036548-k77t6259hbkuqll06d4fidis8547k33h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
