@@ -1,6 +1,18 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:experiences/library/componets/custom_button.dart';
+import 'package:experiences/library/models/model_country.dart';
+import 'package:experiences/library/pages/crop_page/crop_page_view.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
+import 'package:experiences/library/simple_uis.dart';
+import 'package:experiences/library/values.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:kartal/kartal.dart';
 import 'package:money_formatter/money_formatter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Funcs {
   void navigatorPushReplacement(context, page) {
@@ -45,5 +57,89 @@ class Funcs {
       month = "0$month";
     }
     return "${dt.day}.$month.${dt.year} ${dt.hour}:${dt.minute}";
+  }
+
+  Future<Uint8List?> getImage(BuildContext context) async {
+    final ImagePicker picker = ImagePicker();
+    // Pick an image
+    final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery, maxHeight: 150, maxWidth: 150);
+
+    if (image == null) return null;
+
+    var bytes = await image.readAsBytes();
+
+    Uint8List? bytesCroped =
+        await context.navigateToPage(CropPageView(bytes: bytes));
+
+    if (bytesCroped == null) return null;
+
+    return bytesCroped;
+  }
+
+  Future<List<ModelCountry>> getCountries() async {
+    final String response =
+        await rootBundle.loadString('assets/jsons/countries.json');
+    final data = await json.decode(response);
+
+    List<ModelCountry> list = data['countries']
+        .map((e) => ModelCountry.fromJson(e))
+        .toList()
+        .cast<ModelCountry>();
+
+    return list;
+  }
+
+  Future<void> launchLink(String url,
+      [BuildContext? context, bool showAlert = false]) async {
+    if (showAlert && context != null) {
+      bool result = false;
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ClipRRect(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(cRadius),
+            ),
+            child: Dialog(
+              backgroundColor: cBackgroundColor,
+              child: Padding(
+                padding: cPagePaddingWithTop,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        "WARNING!",
+                        style: context.textTheme.headline6!.copyWith(
+                            color: cTextColor, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Text(
+                      "You want to open a link which is provided by user so we do NOT know if the link is safe. Please check the link before you click\n\n$url",
+                      style: context.textTheme.subtitle1!.copyWith(
+                          color: cTextColor, fontWeight: FontWeight.bold),
+                    ),
+                    CustomButton(
+                      text: "Open The Link",
+                      onTap: () {
+                        result = true;
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+
+      if (!result) return;
+    }
+    if (!await launchUrl(Uri.parse(url))) {
+      if (context != null) SimpleUIs().showSnackBar(context, "ERROR!");
+    }
   }
 }

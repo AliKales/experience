@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:experiences/library/funcs.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_user.dart';
+import 'package:experiences/library/services/firebase/auth_firebase.dart';
+import 'package:experiences/library/services/firebase/storage_firebase.dart';
 import 'package:flutter/cupertino.dart';
 
 class FirestoreFirebase {
@@ -60,5 +63,15 @@ class FirestoreFirebase {
     }
 
     return list;
+  }
+
+  static Future<bool> setProfilePicture(
+      {required context, required String url}) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(AuthFirebase().getUid)
+        .update({'photoURL': url});
+
+    return true;
   }
 }

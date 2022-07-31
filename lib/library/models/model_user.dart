@@ -12,7 +12,7 @@ class ModelUser {
       this.id,
       this.createdDate,
       this.photoURL,
-      this.postIds});
+      this.postIds = const []});
 
   ModelUser.fromJson(Map<String, dynamic> json) {
     fullName = json['fullName'];

@@ -33,8 +33,8 @@ class CustomBottomNavBar extends StatelessWidget {
         child: Row(
           children: [
             _item(context, Icons.home_filled, 0, selectedPage),
-            _item(context, Icons.favorite, 1, selectedPage),
-            _item(context, Icons.search, 2, selectedPage),
+            _item(context, Icons.search, 1, selectedPage),
+            _item(context, Icons.add_box_rounded, 2, selectedPage),
             _item(context, Icons.account_circle, 3, selectedPage),
           ],
         ),

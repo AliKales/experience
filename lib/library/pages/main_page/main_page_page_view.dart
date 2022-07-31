@@ -1,5 +1,5 @@
-import 'package:experiences/library/pages/follows_page/follows_page_view.dart';
 import 'package:experiences/library/pages/home_page/home_page_view.dart';
+import 'package:experiences/library/pages/new_post_page/new_post_page_view.dart';
 import 'package:experiences/library/pages/search_page/search_page_view.dart';
 import 'package:experiences/library/pages/user_page/user_page_view.dart';
 import 'package:flutter/material.dart';
@@ -29,10 +29,11 @@ class _MainPagePageViewState extends State<MainPagePageView> {
   Widget build(BuildContext context) {
     return PageView(
       controller: pageController,
+      physics: const NeverScrollableScrollPhysics(),
       children: const [
         HomePageView(),
-        FollowsPageView(),
         SearchPageView(),
+        NewPostPageView(),
         UserPageView(),
       ],
     );

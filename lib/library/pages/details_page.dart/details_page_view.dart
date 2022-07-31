@@ -2,6 +2,7 @@ import 'package:experiences/library/componets/icon_button_back.dart';
 import 'package:experiences/library/componets/percent_indicator.dart';
 import 'package:experiences/library/componets/widget_disable_scroll_glow.dart';
 import 'package:experiences/library/funcs.dart';
+import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_price.dart';
 import 'package:experiences/library/simple_uis.dart';
 import 'package:experiences/library/values.dart';
@@ -9,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 class DetailsPageView extends StatefulWidget {
-  const DetailsPageView({Key? key}) : super(key: key);
+  const DetailsPageView({Key? key, required this.item}) : super(key: key);
+
+  final ModelItemExperience item;
 
   @override
   State<DetailsPageView> createState() => _DetailsPageViewState();
@@ -41,48 +44,73 @@ class _DetailsPageViewState extends State<DetailsPageView>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _bigText(context, "Title"),
-                _smallText(context, "Description will be shown here"),
+                _bigText(context, widget.item.title ?? ""),
+                _smallText(context, widget.item.description ?? ""),
                 SimpleUIs().divider(context),
                 _bigText(context, "Location"),
-                _smallText(context, "Bern\nSwitzerland"),
-                ..._smallTextClickable(context, "Location", () {}),
+                _smallText(context, widget.item.country ?? ""),
+                if (widget.item.locationURL != null)
+                  ..._smallTextClickable(
+                    context,
+                    "Location",
+                    () {
+                      Funcs().launchLink("url", context, true);
+                    },
+                  ),
                 SimpleUIs().divider(context),
-                _bigText(context, "Stay"),
-                _priceWidget(
+                if (_checkAccommandationExisting)
+                  _bigText(context, "Accommodation"),
+                if (_checkAccommandationExisting)
+                  _priceWidget(
                     context,
                     ModelPrice(
-                        label: "Hotel", description: "One Night", price: 20.0)),
-                _smallText(context, "-Wifi"),
-                ..._smallTextClickable(context, "Instagram", () {}),
-                ..._smallTextClickable(context, "Facebook", () {}),
-                ..._smallTextClickable(context, "Website", () {}),
-                ..._smallTextClickable(context, "Location", () {}),
-                SimpleUIs().divider(context),
-                Row(
-                  children: [
-                    Expanded(child: _bigText(context, "Prices")),
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.info_outline_rounded),
+                      label: widget.item.accommandation?.type ?? "",
+                      description: "One Night",
+                      price: widget.item.accommandation?.price,
                     ),
-                  ],
-                ),
-                _priceWidget(
-                    context,
-                    ModelPrice(
-                        label: "Food&Drink",
-                        description: "Daily",
-                        price: 12.3)),
-                _priceWidget(
-                    context,
-                    ModelPrice(
-                        label: "Transport", description: "Daily", price: 12.3)),
-                Align(
-                    alignment: Alignment.centerRight,
-                    child:
-                        _smallText(context, "= ${Funcs().formatMoney(24.6)}")),
-                SimpleUIs().divider(context),
+                  ),
+                if (_checkAccommandationExisting)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: widget.item.accommandation?.details?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return _smallText(context,
+                          "-${widget.item.accommandation?.details?[index]}");
+                    },
+                  ),
+                if (widget.item.accommandation?.instagram != null)
+                  ..._smallTextClickable(context, "Instagram", () {}),
+                if (widget.item.accommandation?.facebook != null)
+                  ..._smallTextClickable(context, "Facebook", () {}),
+                if (widget.item.accommandation?.website != null)
+                  ..._smallTextClickable(context, "Website", () {}),
+                if (widget.item.accommandation?.locationURL != null)
+                  ..._smallTextClickable(context, "Location", () {}),
+                if (_checkAccommandationExisting) SimpleUIs().divider(context),
+                if (_checkPricesExisting)
+                  Row(
+                    children: [
+                      Expanded(child: _bigText(context, "Prices")),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.info_outline_rounded),
+                      ),
+                    ],
+                  ),
+                if (_checkPricesExisting)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: widget.item.prices?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return _priceWidget(context, widget.item.prices![index]);
+                    },
+                  ),
+                if (_checkPricesExisting)
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: _smallText(
+                          context, "= ${_calculatePrice()}")),
+                if (_checkPricesExisting) SimpleUIs().divider(context),
                 _bigText(context, "Photos"),
                 Align(
                   alignment: Alignment.centerRight,
@@ -114,7 +142,9 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 _smallText(context,
                     "How much does the user recommend this experience?"),
                 SizedBox(height: context.dynamicHeight(0.02)),
-                const PercentIndicator(),
+                PercentIndicator(
+                  reccomendation: widget.item.recommendation!,
+                ),
                 SizedBox(height: context.dynamicHeight(0.05)),
               ],
             ),
@@ -123,6 +153,10 @@ class _DetailsPageViewState extends State<DetailsPageView>
       ),
     );
   }
+
+  bool get _checkPricesExisting => widget.item.prices != null;
+
+  bool get _checkAccommandationExisting => widget.item.accommandation != null;
 
   ClipRRect _image(BuildContext context) {
     return ClipRRect(
@@ -144,7 +178,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
       children: [
         Text(
           text,
-          style: context.textTheme.headline4!
+          style: context.textTheme.headline5!
               .copyWith(fontWeight: FontWeight.bold),
         ),
         SizedBox(height: context.dynamicHeight(0.01)),
@@ -195,5 +229,15 @@ class _DetailsPageViewState extends State<DetailsPageView>
       ),
       SizedBox(height: context.dynamicHeight(0.02)),
     ];
+  }
+
+  String _calculatePrice() {
+    double money = 0;
+    for (var element in widget.item.prices??[]) {
+      if (element.price != null) {
+        money += element.price!;
+      }
+    }
+    return "= ${Funcs().formatMoney(money)}";
   }
 }

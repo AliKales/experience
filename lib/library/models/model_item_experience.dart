@@ -1,3 +1,4 @@
+import 'package:experiences/library/models/model_accommandation.dart';
 import 'package:experiences/library/models/model_item_stay.dart';
 import 'package:experiences/library/models/model_price.dart';
 
@@ -10,13 +11,12 @@ class ModelItemExperience {
   String? city;
   String? country;
   String? countryCode;
-  String? latlng;
-  double? lat;
-  double? lng;
-  double? recommendation;
+  String? locationURL;
+  int? recommendation;
   List<String>? photos;
   ModelStay? modelStay;
   List<ModelPrice>? prices;
+  ModelAccommandation? accommandation;
 
   ModelItemExperience({
     this.id,
@@ -27,13 +27,12 @@ class ModelItemExperience {
     this.city,
     this.country,
     this.countryCode,
-    this.latlng,
-    this.lat,
-    this.lng,
+    this.locationURL,
     this.recommendation,
     this.photos,
     this.modelStay,
     this.prices,
+    this.accommandation,
   });
 
   ModelItemExperience.fromJson(Map<String, dynamic> json) {
@@ -45,12 +44,11 @@ class ModelItemExperience {
     city = json['city'];
     country = json['country'];
     countryCode = json['countryCode'];
-    latlng = json['latlng'];
-    lat = json['lat'];
-    lng = json['lng'];
+    locationURL = json['locationURL'];
     recommendation = json['recommendation'];
     photos = json['photos']?.cast<String>();
     modelStay = ModelStay.fromJson(json['modelStay']);
+    accommandation = ModelAccommandation.fromJson(json['accommandation']);
     prices = ModelPrice().fromJsonToList(json['prices']);
   }
 
@@ -64,12 +62,11 @@ class ModelItemExperience {
     data['city'] = city;
     data['country'] = country;
     data['countryCode'] = countryCode;
-    data['latlng'] = latlng;
-    data['lat'] = lat;
-    data['lng'] = lng;
+    data['locationURL'] = locationURL;
     data['recommendation'] = recommendation;
     data['photos'] = photos;
     data['modelStay'] = modelStay?.toJson();
+    data['accommandation'] = accommandation?.toJson();
     data['prices'] = ModelPrice().fromListToJson(prices);
     return data;
   }

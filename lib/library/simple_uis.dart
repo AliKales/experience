@@ -1,3 +1,4 @@
+import 'package:experiences/library/componets/custom_textfield.dart';
 import 'package:experiences/library/values.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
@@ -98,6 +99,39 @@ class SimpleUIs {
           ),
         );
       },
+    );
+  }
+
+  static Widget showDropdownButton({
+    required context,
+    required List<String> list,
+    required Function(Object?) onChanged,
+    required var dropdownValue,
+  }) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return DropdownButton(
+          dropdownColor: cBackgroundColor,
+          value: dropdownValue,
+          hint: const CustomTextField.outlined(labelText: "Search"),
+          items: List.generate(list.length,
+              (index) => _widgetDropDownMenuItem(value: list[index])),
+          onChanged: (value) {
+            setState(() {
+              dropdownValue = value;
+            });
+            onChanged.call(value);
+          },
+        );
+      },
+    );
+  }
+
+  static DropdownMenuItem<String> _widgetDropDownMenuItem(
+      {required String value}) {
+    return DropdownMenuItem(
+      value: value,
+      child: Text(value.toUpperCase()),
     );
   }
 }

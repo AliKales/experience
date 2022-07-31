@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 class PercentIndicator extends StatefulWidget {
-  const PercentIndicator({Key? key}) : super(key: key);
+  const PercentIndicator({Key? key, required this.reccomendation}) : super(key: key);
+
+  final int reccomendation;
 
   @override
   State<PercentIndicator> createState() => _PercentIndicatorState();
@@ -12,7 +14,6 @@ class PercentIndicator extends StatefulWidget {
 
 class _PercentIndicatorState extends State<PercentIndicator> {
   bool isShown = false;
-  int reccomendation = 1;
   int reccomandationCounter = 0;
   int counterToDelete = 4;
   Duration duration = const Duration(milliseconds: 700);
@@ -23,7 +24,7 @@ class _PercentIndicatorState extends State<PercentIndicator> {
     });
     await Future.delayed(duration);
 
-    for (var i = 0; i < reccomendation; i++) {
+    for (var i = 0; i < widget.reccomendation; i++) {
       setState(() {
         reccomandationCounter++;
       });
@@ -31,7 +32,7 @@ class _PercentIndicatorState extends State<PercentIndicator> {
       await Future.delayed(duration);
     }
 
-    for (var i = 0; i < 3 - reccomendation; i++) {
+    for (var i = 0; i < 3 - widget.reccomendation; i++) {
       setState(() {
         counterToDelete--;
       });

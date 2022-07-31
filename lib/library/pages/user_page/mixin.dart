@@ -10,7 +10,7 @@ class _UserPageStatus {
 
 mixin _Mixin<T extends StatefulWidget> on State<T> {
   Future<_UserPageStatus> getUserInfos() async {
-    await Future.delayed(const Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 1));
 
     var resultUser = await FirestoreFirebase.getUser(
         context: context, id: AuthFirebase().getUid);
@@ -28,11 +28,30 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
         serviceStatus: ServiceStatus.done, modelUser: resultUser, items: items);
   }
 
-  void _showModalBottomSheet() {
+  void _showModalBottomSheet(Function(int) onClicked) {
     SimpleUIs.showCustomModalBottomSheet(
       context: context,
       child: Column(
-        children: const [],
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                onClicked.call(0);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.photo_camera),
+                  SizedBox(width: context.dynamicWidth(0.02)),
+                  Text("Change Profile Picture",
+                      style: context.textTheme.headline6),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -40,5 +59,20 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
   void _logOut(context) async {
     await AuthFirebase().logOut(context);
     Funcs().navigatorPushReplacement(context, const LoadingPageView());
+  }
+
+  Future<String?> setProfilePicture() async {
+    var data = await Funcs().getImage(context);
+    if (data == null) return null;
+
+    var link =
+        await StorageFirebase.uploadProfilePhoto(context: context, data: data);
+    if (link == null) return null;
+
+    var result =
+        await FirestoreFirebase.setProfilePicture(context: context, url: link);
+    if (!result) return null;
+
+    return link;
   }
 }

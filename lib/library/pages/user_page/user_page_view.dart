@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../funcs.dart';
+import '../../services/firebase/storage_firebase.dart';
 import '../loading_page/loading_page_view.dart';
 
 part 'mixin.dart';
@@ -50,7 +51,11 @@ class _UserPageViewState extends State<UserPageView>
           IconButton(
             onPressed: () {
               if (_userPageStatus.serviceStatus == ServiceStatus.done) {
-                _showModalBottomSheet();
+                _showModalBottomSheet(
+                  (value) {
+                    if (value == 0) _changeProfilePic();
+                  },
+                );
               }
             },
             icon: const Icon(Icons.more_vert_outlined),
@@ -136,7 +141,7 @@ class _UserPageViewState extends State<UserPageView>
               image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
             ),
           ),
-          imageUrl: "",
+          imageUrl: _userPageStatus.modelUser?.photoURL ?? "",
           errorWidget: (_, __, ___) => _errorWidget(),
         ),
         SizedBox(width: context.dynamicWidth(0.03)),
@@ -171,25 +176,28 @@ class _UserPageViewState extends State<UserPageView>
     );
   }
 
-  Container _errorWidget() {
-    return Container(
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: cSecondryColor,
-      ),
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            _userPageStatus.modelUser?.username?[0].toUpperCase() ?? "",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+  Widget _errorWidget() {
+    return InkWell(
+      onTap: _changeProfilePic,
+      child: Container(
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: cSecondryColor,
         ),
+        child: const Icon(Icons.add_a_photo),
       ),
     );
+  }
+
+  Future<void> _changeProfilePic() async {
+    SimpleUIs().showProgressIndicator(context);
+    String? url = await setProfilePicture();
+    Navigator.pop(context);
+    if (url != null) {
+      setState(() {
+        _userPageStatus.modelUser!.photoURL = url;
+      });
+    }
   }
 
   @override
