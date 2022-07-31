@@ -17,6 +17,7 @@ import '../../values.dart';
 
 part 'mixin.dart';
 part 'prices_view.dart';
+part 'photos_view.dart';
 
 class NewPostPageView extends StatefulWidget {
   const NewPostPageView({Key? key}) : super(key: key);
@@ -27,10 +28,9 @@ class NewPostPageView extends StatefulWidget {
 
 class _NewPostPageViewState extends State<NewPostPageView>
     with
-        SingleTickerProviderStateMixin,
+        
         AutomaticKeepAliveClientMixin<NewPostPageView>,
         _Mixin {
-  late TabController _tabController;
   List<String> countries = [];
 
   ModelItemExperience modelItemExperience = ModelItemExperience();
@@ -88,7 +88,7 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 },
               ),
               SimpleUIs().divider(context),
-              _bigText(context, "Location"),
+              bigText(context, "Location"),
               CustomDropDown(
                 hintText: "Country",
                 items: countries,
@@ -111,7 +111,16 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 },
               ),
               SimpleUIs().divider(context),
-              _bigText(context, "Accommodation (One Night)"),
+              bigText(context, "Accommodation (One Night)"),
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  onPressed: () {
+                    SimpleUIs.showInfoDialog(context: context);
+                  },
+                  icon: const Icon(Icons.info_outline_rounded),
+                ),
+              ),
               CustomDropDown(
                 hintText: "Type",
                 items: Accommodation.values.map((e) => e.name).toList(),
@@ -160,9 +169,11 @@ class _NewPostPageViewState extends State<NewPostPageView>
               SimpleUIs().divider(context),
               Row(
                 children: [
-                  Expanded(child: _bigText(context, "Prices")),
+                  Expanded(child: bigText(context, "Prices")),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      SimpleUIs.showInfoDialog(context: context);
+                    },
                     icon: const Icon(Icons.info_outline_rounded),
                   ),
                 ],
@@ -173,27 +184,9 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 },
               ),
               SimpleUIs().divider(context),
-              _bigText(context, "Photos"),
-              SizedBox(
-                height: context.dynamicHeight(0.01),
-              ),
-              SizedBox(
-                width: double.maxFinite,
-                height: context.dynamicHeight(0.3),
-                child: PageView.builder(
-                  itemCount: 3,
-                  onPageChanged: (val) {
-                    _tabController.animateTo(val);
-                  },
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: _image(context),
-                  ),
-                ),
-              ),
+              _PhotosView(),
               SimpleUIs().divider(context),
-              _bigText(context, "Recommend"),
+              bigText(context, "Recommend"),
               smallText(
                   context, "How much does the user recommend this experience?"),
               SizedBox(height: context.dynamicHeight(0.02)),
@@ -214,21 +207,7 @@ class _NewPostPageViewState extends State<NewPostPageView>
     );
   }
 
-  ClipRRect _image(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.all(
-        Radius.circular(cRadius),
-      ),
-      child: Image.asset(
-        "assets/images/walk.jpg",
-        fit: BoxFit.cover,
-        width: double.maxFinite,
-        height: context.dynamicHeight(0.3),
-      ),
-    );
-  }
-
-  Widget _bigText(BuildContext context, String text) {
+  Widget bigText(BuildContext context, String text) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

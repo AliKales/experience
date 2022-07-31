@@ -10,9 +10,8 @@ class _PricesView extends StatefulWidget {
 }
 
 class __PricesViewState extends State<_PricesView> {
-  double? price;
-  String? label;
-  String? description;
+  List<TextEditingController> tECS =
+      List.generate(3, (index) => TextEditingController());
 
   List<ModelPrice> prices = [];
 
@@ -24,23 +23,24 @@ class __PricesViewState extends State<_PricesView> {
           shrinkWrap: true,
           itemCount: prices.length,
           itemBuilder: (context, index) {
-            return _priceWidget(context, prices[index]);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 15.0),
+              child: _priceWidget(context, prices[index]),
+            );
           },
         ),
         CustomTextField.outlined(
           labelText: "Label (Food&Drink)",
-          onChanged: (String val) {},
+          tEC: tECS.first,
         ),
         CustomTextField.outlined(
           labelText: "Description (Daily)",
-          onChanged: (String val) {},
+          tEC: tECS[1],
         ),
         CustomTextField.outlined(
           labelText: "Price (\$13.40)",
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (String value) {
-            price = double.tryParse(value);
-          },
+          tEC: tECS[2],
         ),
         CustomButton(text: "Add", onTap: _handleAdd),
         Align(
@@ -94,13 +94,28 @@ class __PricesViewState extends State<_PricesView> {
   }
 
   void _handleAdd() {
-    if (label == null || label?.trim() == "") return;
-    if (price == null) return;
+    if (tECS.first.text.trim() == "") return;
+    String price = tECS[2].text.trim();
+    if (price == "") return;
 
+    if (!RegExp(r'^[0-9\.]+$').hasMatch(price) || price.split(".").length > 2) {
+      SimpleUIs().showSnackBar(context, "Wrong price input!");
+
+      return;
+    }
+
+    prices.add(
+      ModelPrice(
+          label: tECS.first.text.trim(),
+          price: double.tryParse(tECS[2].text.trim()),
+          description: tECS[1].text.trim()),
+    );
     setState(() {
-      prices.add(
-        ModelPrice(label: label, price: price, description: description),
-      );
+      for (var element in tECS) {
+        element.clear();
+      }
     });
+
+    widget.onChanged.call(prices);
   }
 }

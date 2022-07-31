@@ -6,13 +6,14 @@ class ModelUser {
   String? photoURL;
   List<String>? postIds;
 
-  ModelUser(
-      {this.fullName,
-      this.username,
-      this.id,
-      this.createdDate,
-      this.photoURL,
-      this.postIds = const []});
+  ModelUser({
+    this.fullName,
+    this.username,
+    this.id,
+    this.createdDate,
+    this.photoURL,
+    this.postIds = const [],
+  });
 
   ModelUser.fromJson(Map<String, dynamic> json) {
     fullName = json['fullName'];

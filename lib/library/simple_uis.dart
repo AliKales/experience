@@ -134,4 +134,48 @@ class SimpleUIs {
       child: Text(value.toUpperCase()),
     );
   }
+
+  static Future dialogCustom({required context, required Widget child}) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(cRadius),
+          ),
+          child: Dialog(
+            backgroundColor: cBackgroundColor,
+            child: Padding(
+              padding: cPagePaddingWithTop,
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> showInfoDialog({required BuildContext context}) async {
+    SimpleUIs.dialogCustom(
+      context: context,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              "INFORMATION",
+              style: context.textTheme.headline6!
+                  .copyWith(color: cTextColor, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Text(
+            "These prices may not match 100%. Please do not plan based on these prices!",
+            style: context.textTheme.subtitle1!
+                .copyWith(color: cTextColor, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
 }

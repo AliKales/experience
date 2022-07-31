@@ -94,50 +94,43 @@ class Funcs {
       [BuildContext? context, bool showAlert = false]) async {
     if (showAlert && context != null) {
       bool result = false;
-      await showDialog(
+
+      SimpleUIs.dialogCustom(
         context: context,
-        builder: (BuildContext context) {
-          return ClipRRect(
-            borderRadius: const BorderRadius.all(
-              Radius.circular(cRadius),
-            ),
-            child: Dialog(
-              backgroundColor: cBackgroundColor,
-              child: Padding(
-                padding: cPagePaddingWithTop,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        "WARNING!",
-                        style: context.textTheme.headline6!.copyWith(
-                            color: cTextColor, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Text(
-                      "You want to open a link which is provided by user so we do NOT know if the link is safe. Please check the link before you click\n\n$url",
-                      style: context.textTheme.subtitle1!.copyWith(
-                          color: cTextColor, fontWeight: FontWeight.bold),
-                    ),
-                    CustomButton(
-                      text: "Open The Link",
-                      onTap: () {
-                        result = true;
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                "WARNING!",
+                style: context.textTheme.headline6!
+                    .copyWith(color: cTextColor, fontWeight: FontWeight.bold),
               ),
             ),
-          );
-        },
+            Text(
+              "You want to open a link which is provided by user so we do NOT know if the link is safe. Please check the link before you click\n\n$url",
+              style: context.textTheme.subtitle1!
+                  .copyWith(color: cTextColor, fontWeight: FontWeight.bold),
+            ),
+            CustomButton(
+              text: "Open The Link",
+              onTap: () {
+                result = true;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       );
 
       if (!result) return;
     }
+
+    if (!url.contains("https://") && !url.contains("http://")) {
+      url = "https://$url";
+    }
+
     if (!await launchUrl(Uri.parse(url))) {
       if (context != null) SimpleUIs().showSnackBar(context, "ERROR!");
     }

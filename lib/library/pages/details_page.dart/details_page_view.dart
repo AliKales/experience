@@ -92,7 +92,9 @@ class _DetailsPageViewState extends State<DetailsPageView>
                     children: [
                       Expanded(child: _bigText(context, "Prices")),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          SimpleUIs.showInfoDialog(context: context);
+                        },
                         icon: const Icon(Icons.info_outline_rounded),
                       ),
                     ],
@@ -108,8 +110,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 if (_checkPricesExisting)
                   Align(
                       alignment: Alignment.centerRight,
-                      child: _smallText(
-                          context, "= ${_calculatePrice()}")),
+                      child: _smallText(context, "= ${_calculatePrice()}")),
                 if (_checkPricesExisting) SimpleUIs().divider(context),
                 _bigText(context, "Photos"),
                 Align(
@@ -233,7 +234,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
 
   String _calculatePrice() {
     double money = 0;
-    for (var element in widget.item.prices??[]) {
+    for (var element in widget.item.prices ?? []) {
       if (element.price != null) {
         money += element.price!;
       }
