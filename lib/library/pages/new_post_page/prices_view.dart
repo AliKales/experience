@@ -74,7 +74,19 @@ class __PricesViewState extends State<_PricesView> {
             smallText(context, Funcs().formatMoney(modelPrice.price ?? 0)),
           ],
         ),
-        smallerText(context, "(${modelPrice.description})"),
+        Row(
+          children: [
+            Expanded(
+                child: smallerText(context, "(${modelPrice.description})")),
+            IconButton(
+              onPressed: () {
+                prices.remove(modelPrice);
+                setState(() {});
+              },
+              icon: Icon(Icons.delete, color: Colors.red),
+            ),
+          ],
+        ),
       ],
     );
   }

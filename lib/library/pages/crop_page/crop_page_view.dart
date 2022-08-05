@@ -5,9 +5,11 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 
 class CropPageView extends StatefulWidget {
-  const CropPageView({Key? key, required this.bytes}) : super(key: key);
+  const CropPageView({Key? key, required this.bytes, this.isProfilePic})
+      : super(key: key);
 
   final Uint8List bytes;
+  final bool? isProfilePic;
 
   @override
   State<CropPageView> createState() => _CropPageViewState();
@@ -25,7 +27,7 @@ class _CropPageViewState extends State<CropPageView> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pop(context,editorKey.currentState!.rawImageData);
+              Navigator.pop(context, editorKey.currentState!.rawImageData);
             },
             icon: const Icon(Icons.check),
           ),
@@ -51,7 +53,8 @@ class _CropPageViewState extends State<CropPageView> {
         initEditorConfigHandler: (state) {
           return EditorConfig(
             cropRectPadding: const EdgeInsets.all(20.0),
-            cropAspectRatio: CropAspectRatios.ratio1_1,
+            cropAspectRatio:
+                widget.isProfilePic ?? false ? CropAspectRatios.ratio1_1 : null,
           );
         },
       ),

@@ -1,14 +1,18 @@
+import 'dart:typed_data';
+
 import 'package:experiences/library/componets/custom_button.dart';
 import 'package:experiences/library/componets/custom_dropdown.dart';
 import 'package:experiences/library/componets/custom_radio.dart';
 import 'package:experiences/library/componets/custom_textfield.dart';
 import 'package:experiences/library/models/model_accommandation.dart';
+import 'package:experiences/library/models/model_country.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/pages/details_page.dart/details_page_view.dart';
+import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
-import '../../componets/icon_button_back.dart';
+import '../../componets/custom_appbar.dart';
 import '../../componets/widget_disable_scroll_glow.dart';
 import '../../funcs.dart';
 import '../../models/model_price.dart';
@@ -16,8 +20,8 @@ import '../../simple_uis.dart';
 import '../../values.dart';
 
 part 'mixin.dart';
-part 'prices_view.dart';
 part 'photos_view.dart';
+part 'prices_view.dart';
 
 class NewPostPageView extends StatefulWidget {
   const NewPostPageView({Key? key}) : super(key: key);
@@ -27,15 +31,14 @@ class NewPostPageView extends StatefulWidget {
 }
 
 class _NewPostPageViewState extends State<NewPostPageView>
-    with
-        
-        AutomaticKeepAliveClientMixin<NewPostPageView>,
-        _Mixin {
-  List<String> countries = [];
+    with AutomaticKeepAliveClientMixin<NewPostPageView>, _Mixin {
+  List<ModelCountry> countries = [];
 
   ModelItemExperience modelItemExperience = ModelItemExperience();
 
   ModelAccommandation modelAccommandation = ModelAccommandation();
+
+  List<Uint8List> photos = [];
 
   @override
   void initState() {
@@ -43,7 +46,7 @@ class _NewPostPageViewState extends State<NewPostPageView>
     super.initState();
 
     Funcs().getCountries().then((value) {
-      countries = value.map((e) => e.name ?? "").toList();
+      countries = value;
       if (mounted) {
         setState(() {});
       }
@@ -54,10 +57,9 @@ class _NewPostPageViewState extends State<NewPostPageView>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        leading: const IconButtonBack(),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      appBar: const CustomAppBar(
+        leadingIcon: Icons.add,
+        text: "New Experience",
       ),
       body: countries.isEmpty
           ? Center(
@@ -91,9 +93,12 @@ class _NewPostPageViewState extends State<NewPostPageView>
               bigText(context, "Location"),
               CustomDropDown(
                 hintText: "Country",
-                items: countries,
+                items: countries.map((e) => e.name ?? "").toList(),
                 onChanged: (value) {
                   modelItemExperience.country = value;
+                  modelItemExperience.countryCode = countries
+                      .firstWhere((element) => element.name == value)
+                      .code;
                 },
               ),
               CustomTextField.outlined(
@@ -184,7 +189,14 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 },
               ),
               SimpleUIs().divider(context),
-              _PhotosView(),
+              _PhotosView(
+                onPhotoAdd: (photo) {
+                  photos.add(photo);
+                },
+                onPhotoDelete: (index) {
+                  photos.removeAt(index);
+                },
+              ),
               SimpleUIs().divider(context),
               bigText(context, "Recommend"),
               smallText(
@@ -268,12 +280,20 @@ class _NewPostPageViewState extends State<NewPostPageView>
       SimpleUIs().showSnackBar(context, "Recommendation can not be empty!");
       return;
     }
+    if (photos.isNullOrEmpty) {
+      SimpleUIs().showSnackBar(context, "Photos can not be empty!");
+      return;
+    }
 
     modelItemExperience.accommandation = modelAccommandation;
+
+    modelItemExperience.userId = AuthFirebase().getUid;
 
     context.navigateToPage(
       DetailsPageView(
         item: modelItemExperience,
+        photos: photos,
+        isNewExperience: true,
       ),
     );
   }

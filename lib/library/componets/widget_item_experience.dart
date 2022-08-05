@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+
 import '../values.dart';
 
 class WidgetItemExperience extends StatelessWidget {
@@ -28,39 +30,35 @@ class WidgetItemExperience extends StatelessWidget {
             borderRadius: const BorderRadius.all(
               Radius.circular(cRadius),
             ),
-            child: Image.asset(
-              "assets/images/walk.jpg",
+            child: CachedNetworkImage(
+              imageUrl: item.photos!.first,
               fit: BoxFit.cover,
               width: double.maxFinite,
               height: context.dynamicHeight(0.3),
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "Title will be shown here",
-                  style: context.textTheme.headline5!.copyWith(
-                    color: cTextColor,
-                    fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.only(top: 5.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.title ?? "",
+                    style: context.textTheme.headline5!.copyWith(
+                      color: cTextColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              if (isStarShown!)
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.star_border,
-                    color: Colors.yellow,
+                if (isStarShown!)
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.star_border,
+                      color: Colors.yellow,
+                    ),
                   ),
-                ),
-            ],
-          ),
-          Text(
-            "@ali.kales",
-            style: context.textTheme.headline6!.copyWith(
-              color: cTextColor,
-              fontWeight: FontWeight.normal,
+              ],
             ),
           ),
           Row(
@@ -68,7 +66,7 @@ class WidgetItemExperience extends StatelessWidget {
               const Spacer(),
               const Icon(Icons.location_on),
               Text(
-                "Zuric/CH",
+                item.country ?? "",
                 style: context.textTheme.headline6!.copyWith(
                   color: cTextColor,
                   fontWeight: FontWeight.normal,

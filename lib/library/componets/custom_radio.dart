@@ -10,7 +10,7 @@ class CustomRadio extends StatefulWidget {
 }
 
 class _CustomRadioState extends State<CustomRadio> {
-  int _value = -1;
+  int _value = 0;
 
   List<String> recommendations = [];
 
@@ -28,10 +28,10 @@ class _CustomRadioState extends State<CustomRadio> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        for (int i = 0; i <= recommendations.length - 1; i++)
+        for (int i = 1; i <= recommendations.length; i++)
           ListTile(
             title: Text(
-              recommendations[i].toUpperCase(),
+              recommendations[i - 1].toUpperCase(),
               style: Theme.of(context)
                   .textTheme
                   .subtitle1!

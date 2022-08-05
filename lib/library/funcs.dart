@@ -59,18 +59,23 @@ class Funcs {
     return "${dt.day}.$month.${dt.year} ${dt.hour}:${dt.minute}";
   }
 
-  Future<Uint8List?> getImage(BuildContext context) async {
+  Future<Uint8List?> getImage(BuildContext context,
+      [bool? isProfilePic, double? mH, double? mW]) async {
     final ImagePicker picker = ImagePicker();
     // Pick an image
     final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery, maxHeight: 150, maxWidth: 150);
+        source: ImageSource.gallery, maxHeight: mH, maxWidth: mW);
 
     if (image == null) return null;
 
     var bytes = await image.readAsBytes();
 
-    Uint8List? bytesCroped =
-        await context.navigateToPage(CropPageView(bytes: bytes));
+    Uint8List? bytesCroped = await context.navigateToPage(
+      CropPageView(
+        bytes: bytes,
+        isProfilePic: isProfilePic,
+      ),
+    );
 
     if (bytesCroped == null) return null;
 

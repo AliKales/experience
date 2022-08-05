@@ -1,9 +1,13 @@
+import 'dart:core';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:experiences/library/componets/custom_appbar.dart';
+import 'package:experiences/library/componets/custom_button.dart';
 import 'package:experiences/library/componets/widget_disable_scroll_glow.dart';
 import 'package:experiences/library/componets/widget_item_experience.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_user.dart';
+import 'package:experiences/library/pages/details_page.dart/details_page_view.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:experiences/library/services/firebase/firestore_firebase.dart';
 import 'package:experiences/library/simple_uis.dart';
@@ -18,7 +22,9 @@ import '../loading_page/loading_page_view.dart';
 part 'mixin.dart';
 
 class UserPageView extends StatefulWidget {
-  const UserPageView({Key? key}) : super(key: key);
+  const UserPageView({Key? key, this.userId}) : super(key: key);
+
+  final String? userId;
 
   @override
   State<UserPageView> createState() => _UserPageViewState();
@@ -33,7 +39,8 @@ class _UserPageViewState extends State<UserPageView>
   void initState() {
     // TODO: implement initState
     super.initState();
-    getUserInfos().then((value) {
+
+    getUserInfos(widget.userId).then((value) {
       setState(() {
         _userPageStatus = value;
       });
@@ -48,23 +55,46 @@ class _UserPageViewState extends State<UserPageView>
         leadingIcon: Icons.account_circle,
         text: "User",
         actions: [
-          IconButton(
-            onPressed: () {
-              if (_userPageStatus.serviceStatus == ServiceStatus.done) {
-                _showModalBottomSheet(
-                  (value) {
-                    if (value == 0) _changeProfilePic();
-                  },
-                );
-              }
-            },
-            icon: const Icon(Icons.more_vert_outlined),
-          ),
+          if (!_isUserSent())
+            IconButton(
+              onPressed: () {
+                if (_userPageStatus.serviceStatus == ServiceStatus.done) {
+                  _showModalBottomSheet(
+                    (value) {
+                      if (value == 0) _changeProfilePic();
+                    },
+                  );
+                }
+              },
+              icon: const Icon(Icons.more_vert_outlined),
+            ),
         ],
       ),
-      body: _userPageStatus.serviceStatus == ServiceStatus.loading
-          ? SimpleUIs.progressIndicator()
-          : _mainBody(context),
+      body: _userPageStatus.serviceStatus == ServiceStatus.empty
+          ? _isUserSent()
+              ? const SizedBox.shrink()
+              : Padding(
+                  padding: cPagePaddingWithTop,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CustomButton(
+                          text: "LOG IN",
+                          onTap: () {
+                            Funcs().navigatorPushReplacement(
+                              context,
+                              const LoadingPageView(),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+          : _userPageStatus.serviceStatus == ServiceStatus.loading
+              ? SimpleUIs.progressIndicator()
+              : _mainBody(context),
     );
   }
 
@@ -117,6 +147,14 @@ class _UserPageViewState extends State<UserPageView>
                         return WidgetItemExperience(
                           isStarShown: false,
                           item: _userPageStatus.items![index],
+                          onTap: () {
+                            context.navigateToPage(
+                              DetailsPageView(
+                                item: _userPageStatus.items![index],
+                                letGoUserPage: false,
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -168,15 +206,24 @@ class _UserPageViewState extends State<UserPageView>
             ],
           ),
         ),
-        IconButton(
-          onPressed: () => _logOut(context),
-          icon: const Icon(Icons.logout_outlined, color: Colors.red),
-        ),
+        if (!_isUserSent())
+          IconButton(
+            onPressed: () => _logOut(context),
+            icon: const Icon(Icons.logout_outlined, color: Colors.red),
+          ),
       ],
     );
   }
 
   Widget _errorWidget() {
+    if (_isUserSent()) {
+      return Container(
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: cSecondryColor,
+        ),
+      );
+    }
     return InkWell(
       onTap: _changeProfilePic,
       child: Container(
@@ -199,6 +246,8 @@ class _UserPageViewState extends State<UserPageView>
       });
     }
   }
+
+  bool _isUserSent() => widget.userId != null;
 
   @override
   // TODO: implement wantKeepAlive

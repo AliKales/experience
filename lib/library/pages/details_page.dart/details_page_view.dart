@@ -1,32 +1,59 @@
+import 'dart:typed_data';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:experiences/library/componets/custom_button.dart';
 import 'package:experiences/library/componets/icon_button_back.dart';
 import 'package:experiences/library/componets/percent_indicator.dart';
 import 'package:experiences/library/componets/widget_disable_scroll_glow.dart';
 import 'package:experiences/library/funcs.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_price.dart';
+import 'package:experiences/library/pages/user_page/user_page_view.dart';
+import 'package:experiences/library/services/firebase/firestore_firebase.dart';
+import 'package:experiences/library/services/firebase/storage_firebase.dart';
 import 'package:experiences/library/simple_uis.dart';
 import 'package:experiences/library/values.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
+part 'mixin.dart';
+
 class DetailsPageView extends StatefulWidget {
-  const DetailsPageView({Key? key, required this.item}) : super(key: key);
+  const DetailsPageView(
+      {Key? key,
+      required this.item,
+      this.photos,
+      this.isNewExperience = false,
+      this.letGoUserPage = true})
+      : super(key: key);
 
   final ModelItemExperience item;
+  final List<Uint8List>? photos;
+  final bool? isNewExperience;
+  final bool? letGoUserPage;
 
   @override
   State<DetailsPageView> createState() => _DetailsPageViewState();
 }
 
 class _DetailsPageViewState extends State<DetailsPageView>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+    with SingleTickerProviderStateMixin, _Mixin {
+  TabController? _tabController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+
+    if (widget.photos.isNotNullOrEmpty) init(widget.item);
+
+    if (widget.photos.isNotNullOrEmpty) {
+      _tabController =
+          TabController(length: widget.photos!.length, vsync: this);
+    } else {
+      _tabController =
+          TabController(length: widget.item.photos!.length, vsync: this);
+    }
   }
 
   @override
@@ -71,11 +98,12 @@ class _DetailsPageViewState extends State<DetailsPageView>
                   ),
                 if (_checkAccommandationExisting)
                   ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: widget.item.accommandation?.details?.length ?? 0,
                     itemBuilder: (context, index) {
                       return _smallText(context,
-                          "-${widget.item.accommandation?.details?[index]}");
+                          "-${widget.item.accommandation?.details?[index].trim()}");
                     },
                   ),
                 if (widget.item.accommandation?.instagram != null)
@@ -101,6 +129,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
                   ),
                 if (_checkPricesExisting)
                   ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: widget.item.prices?.length ?? 0,
                     itemBuilder: (context, index) {
@@ -110,34 +139,36 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 if (_checkPricesExisting)
                   Align(
                       alignment: Alignment.centerRight,
-                      child: _smallText(context, "= ${_calculatePrice()}")),
+                      child: _smallText(context, _calculatePrice())),
                 if (_checkPricesExisting) SimpleUIs().divider(context),
                 _bigText(context, "Photos"),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TabPageSelector(
-                    selectedColor: cTextColor,
-                    controller: _tabController,
+                if (_tabController != null)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TabPageSelector(
+                      selectedColor: cTextColor,
+                      controller: _tabController,
+                    ),
                   ),
-                ),
                 SizedBox(
                   height: context.dynamicHeight(0.01),
                 ),
-                SizedBox(
-                  width: double.maxFinite,
-                  height: context.dynamicHeight(0.3),
-                  child: PageView.builder(
-                    itemCount: 3,
-                    onPageChanged: (val) {
-                      _tabController.animateTo(val);
-                    },
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: _image(context),
+                if (_tabController != null)
+                  SizedBox(
+                    width: double.maxFinite,
+                    height: context.dynamicHeight(0.3),
+                    child: PageView.builder(
+                      itemCount: _tabController!.length,
+                      onPageChanged: (val) {
+                        _tabController!.animateTo(val);
+                      },
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: _image(index),
+                      ),
                     ),
                   ),
-                ),
                 SimpleUIs().divider(context),
                 _bigText(context, "Recommend"),
                 _smallText(context,
@@ -146,6 +177,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 PercentIndicator(
                   reccomendation: widget.item.recommendation!,
                 ),
+                ...seeProfileOrShareWidget(),
                 SizedBox(height: context.dynamicHeight(0.05)),
               ],
             ),
@@ -157,19 +189,54 @@ class _DetailsPageViewState extends State<DetailsPageView>
 
   bool get _checkPricesExisting => widget.item.prices != null;
 
-  bool get _checkAccommandationExisting => widget.item.accommandation != null;
+  //Here it cheks type because accommandation is never empty but type can be empty
+  bool get _checkAccommandationExisting =>
+      widget.item.accommandation?.type != null;
 
-  ClipRRect _image(BuildContext context) {
+  List<Widget> seeProfileOrShareWidget() {
+    if (widget.isNewExperience ?? false) {
+      return [
+        CustomButton(
+          text: "Share",
+          onTap: () {
+            _handleShare(context, widget.photos!);
+          },
+        )
+      ];
+    }
+
+    if (!widget.letGoUserPage!) return [const SizedBox.shrink()];
+    return [
+      SimpleUIs().divider(context),
+      CustomButton.outlined(
+        text: "User's Page",
+        onTap: () {
+          context.navigateToPage(UserPageView(
+            userId: widget.item.userId,
+          ));
+        },
+      ),
+    ];
+  }
+
+  ClipRRect _image(int index) {
     return ClipRRect(
       borderRadius: const BorderRadius.all(
         Radius.circular(cRadius),
       ),
-      child: Image.asset(
-        "assets/images/walk.jpg",
-        fit: BoxFit.cover,
-        width: double.maxFinite,
-        height: context.dynamicHeight(0.3),
-      ),
+      child: widget.photos == null
+          ? CachedNetworkImage(
+              imageUrl: widget.item.photos![index],
+              fit: BoxFit.cover,
+              width: double.maxFinite,
+              height: context.dynamicHeight(0.3),
+            )
+          : Image.memory(
+              widget.photos![index],
+              fit: BoxFit.cover,
+              width: double.maxFinite,
+              height: context.dynamicHeight(0.3),
+            ),
     );
   }
 

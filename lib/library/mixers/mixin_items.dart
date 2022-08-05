@@ -1,4 +1,5 @@
 import 'package:experiences/library/providers/item_experiences_provider.dart';
+import 'package:experiences/library/services/firebase/firestore_firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,8 +10,10 @@ mixin MixinItems<T extends StatefulWidget> on State<T> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("object");
-    // Provider.of<MotelItemExperienceProvider>(context, listen: false)
-    //     .addToHomePageItems([]);
+
+    FirestoreFirebase.getExperiences(context: context).then((value) {
+      Provider.of<MotelItemExperienceProvider>(context, listen: false)
+          .addToHomePageItems(value);
+    });
   }
 }

@@ -7,6 +7,8 @@ import 'package:experiences/library/services/firebase/storage_firebase.dart';
 import 'package:flutter/cupertino.dart';
 
 class FirestoreFirebase {
+  static DocumentSnapshot<Object?>? documentSnapshot;
+
   //AUTH PART
 
   ///[getUser] [username] and [id] shouldnt be given at the same time for but if its given
@@ -73,5 +75,59 @@ class FirestoreFirebase {
         .update({'photoURL': url});
 
     return true;
+  }
+
+  static Future<bool> addExperienceToUser(
+      {required context, required List elements}) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(AuthFirebase().getUid)
+        .update({'postIds': FieldValue.arrayUnion(elements)});
+
+    return true;
+  }
+
+  static Future<bool> shareExperience({
+    required context,
+    required ModelItemExperience experience,
+    required String path,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection("experiences")
+        .doc(path)
+        .set(experience.toJson());
+
+    return true;
+  }
+
+  static Future<List<ModelItemExperience>> getExperiences(
+      {required context}) async {
+    final QuerySnapshot result;
+    List<ModelItemExperience> listToReturn = [];
+
+    if (FirestoreFirebase.documentSnapshot == null) {
+      result = await FirebaseFirestore.instance
+          .collection("experiences")
+          .limit(10)
+          .get();
+    } else {
+      result = await FirebaseFirestore.instance
+          .collection("experiences")
+          .startAfterDocument(FirestoreFirebase.documentSnapshot!)
+          .limit(10)
+          .get();
+    }
+
+    for (var i = 0; i < result.docs.length; i++) {
+      var element = result.docs[i];
+      listToReturn.add(
+          ModelItemExperience.fromJson(element.data() as Map<String, dynamic>));
+
+      if (i == result.docs.length - 1) {
+        FirestoreFirebase.documentSnapshot = element;
+      }
+    }
+
+    return listToReturn;
   }
 }

@@ -9,20 +9,27 @@ class _UserPageStatus {
 }
 
 mixin _Mixin<T extends StatefulWidget> on State<T> {
-  Future<_UserPageStatus> getUserInfos() async {
+  Future<_UserPageStatus> getUserInfos([String? userId]) async {
     await Future.delayed(const Duration(seconds: 1));
 
+    if (!AuthFirebase().isSignedIn && userId.isNullOrEmpty) {
+      return _UserPageStatus(serviceStatus: ServiceStatus.empty);
+    }
+
     var resultUser = await FirestoreFirebase.getUser(
-        context: context, id: AuthFirebase().getUid);
+        context: context, id: userId ?? AuthFirebase().getUid);
 
     if (resultUser == null) {
       return _UserPageStatus(serviceStatus: ServiceStatus.empty);
     }
 
-    List<ModelItemExperience> items =
-        await FirestoreFirebase.getItemsExperiencesForProfile(
-                resultUser.postIds?.reversed.toList().sublist(0, 5) ?? []) ??
-            [];
+    List<ModelItemExperience> items = [];
+
+    if (resultUser.postIds.isNotNullOrEmpty) {
+      items = await FirestoreFirebase.getItemsExperiencesForProfile(
+              getPostIds(resultUser)) ??
+          [];
+    }
 
     return _UserPageStatus(
         serviceStatus: ServiceStatus.done, modelUser: resultUser, items: items);
@@ -62,7 +69,7 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
   }
 
   Future<String?> setProfilePicture() async {
-    var data = await Funcs().getImage(context);
+    var data = await Funcs().getImage(context, true, 150, 150);
     if (data == null) return null;
 
     var link =
@@ -74,5 +81,13 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
     if (!result) return null;
 
     return link;
+  }
+}
+
+List<String> getPostIds(ModelUser resultUser) {
+  if (resultUser.postIds!.length >= 5) {
+    return resultUser.postIds?.reversed.toList().sublist(0, 5) ?? [];
+  } else {
+    return resultUser.postIds?.reversed.toList() ?? [];
   }
 }
