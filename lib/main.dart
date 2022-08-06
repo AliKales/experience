@@ -6,6 +6,7 @@ import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:experiences/library/values.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kartal/kartal.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,9 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await Hive.initFlutter();
+  await Hive.openBox('faves');
 
   runApp(
     MultiProvider(
@@ -39,19 +43,28 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Experience',
-      theme: ThemeData(
-          scaffoldBackgroundColor: cBackgroundColor,
-          appBarTheme: _appBarTheme(),
-          iconTheme: _iconTheme(),
-          dividerTheme: _dividerTheme(context),
-          textTheme: context.textTheme
-              .apply(bodyColor: cTextColor, displayColor: cTextColor)),
-      home: AuthFirebase().isSignedIn
-          ? const MainPageView()
-          : const FirstPageView(),
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Experience',
+        theme: ThemeData(
+            scaffoldBackgroundColor: cBackgroundColor,
+            appBarTheme: _appBarTheme(),
+            iconTheme: _iconTheme(),
+            dividerTheme: _dividerTheme(context),
+            textTheme: context.textTheme
+                .apply(bodyColor: cTextColor, displayColor: cTextColor)),
+        home: AuthFirebase().isSignedIn
+            ? const MainPageView()
+            : const FirstPageView(),
+      ),
     );
   }
 

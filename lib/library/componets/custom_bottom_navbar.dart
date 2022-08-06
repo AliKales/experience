@@ -1,3 +1,4 @@
+import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,8 @@ class CustomBottomNavBar extends StatelessWidget {
           children: [
             _item(context, Icons.home_filled, 0, selectedPage),
             _item(context, Icons.search, 1, selectedPage),
-            _item(context, Icons.add_box_rounded, 2, selectedPage),
+            if (AuthFirebase().isSignedIn)
+              _item(context, Icons.add_box_rounded, 2, selectedPage),
             _item(context, Icons.account_circle, 3, selectedPage),
           ],
         ),

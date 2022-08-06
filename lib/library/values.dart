@@ -15,6 +15,8 @@ const cIconColor = Color(0xFFC2C2C2);
 const cTextColor = Color(0xFFFFFFFF);
 const cTextFieldColor = Color(0xFFF1F1F1);
 
+const cSearchDelay = Duration(milliseconds: 1500);
+
 enum ServiceStatus {
   empty,
   loading,

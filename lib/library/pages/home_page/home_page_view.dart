@@ -1,4 +1,5 @@
 import 'package:experiences/library/componets/custom_appbar.dart';
+import 'package:experiences/library/componets/last_widget.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/pages/details_page.dart/details_page_view.dart';
 import 'package:experiences/library/values.dart';
@@ -35,21 +36,35 @@ class _HomePageViewState extends State<HomePageView>
     );
   }
 
-  WidgetDisableScrollGlow _experiences(List<ModelItemExperience> items) {
+  Widget _experiences(List<ModelItemExperience> items) {
     return WidgetDisableScrollGlow(
       child: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return WidgetItemExperience(
-            item: items[index],
-            onTap: () {
-              context.navigateToPage(
-                DetailsPageView(item: items[index]),
-              );
-            },
-          );
+          if (index == items.length - 1 && items.length > 10) {
+            return LastWidget(
+                onShown: () {
+                  print("object");
+                },
+                child: _widgetExperiences(items, index, context));
+          }
+          return _widgetExperiences(items, index, context);
         },
       ),
+    );
+  }
+
+  WidgetItemExperience _widgetExperiences(
+      List<ModelItemExperience> items, int index, BuildContext context) {
+    return WidgetItemExperience(
+      item: items[index],
+      onTap: () async {
+        await context.navigateToPage(
+          DetailsPageView(item: items[index]),
+        );
+        //here we refresh in case of user adding it to favorites
+        setState(() {});
+      },
     );
   }
 

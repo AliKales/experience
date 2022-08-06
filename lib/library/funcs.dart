@@ -97,10 +97,15 @@ class Funcs {
 
   Future<void> launchLink(String url,
       [BuildContext? context, bool showAlert = false]) async {
+    if (!url.contains("https://") && !url.contains("http://")) {
+      url.replaceAll("https://", "");
+      url.replaceAll("http://", "");
+      url = "https://$url";
+    }
     if (showAlert && context != null) {
       bool result = false;
 
-      SimpleUIs.dialogCustom(
+      await SimpleUIs.dialogCustom(
         context: context,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -132,11 +137,8 @@ class Funcs {
       if (!result) return;
     }
 
-    if (!url.contains("https://") && !url.contains("http://")) {
-      url = "https://$url";
-    }
-
-    if (!await launchUrl(Uri.parse(url))) {
+    if (!await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalApplication)) {
       if (context != null) SimpleUIs().showSnackBar(context, "ERROR!");
     }
   }

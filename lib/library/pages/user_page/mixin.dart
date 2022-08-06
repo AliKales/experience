@@ -8,27 +8,68 @@ class _UserPageStatus {
   _UserPageStatus({this.serviceStatus, this.modelUser, this.items});
 }
 
+class _ItemToAddLater {
+  ModelItemExperience? item;
+  int? index;
+
+  _ItemToAddLater(this.item, this.index);
+}
+
 mixin _Mixin<T extends StatefulWidget> on State<T> {
-  Future<_UserPageStatus> getUserInfos([String? userId]) async {
+  Future<List<ModelItemExperience>> loadMore(List<String> postIds) async {
+    return await FirestoreFirebase.getItemsExperiencesForProfile(postIds) ?? [];
+  }
+
+  Future<_UserPageStatus> getUserInfos(
+      [String? userId, ModelUser? user]) async {
     await Future.delayed(const Duration(seconds: 1));
 
-    if (!AuthFirebase().isSignedIn && userId.isNullOrEmpty) {
+    if (!AuthFirebase().isSignedIn && userId.isNullOrEmpty && user == null) {
       return _UserPageStatus(serviceStatus: ServiceStatus.empty);
     }
 
-    var resultUser = await FirestoreFirebase.getUser(
-        context: context, id: userId ?? AuthFirebase().getUid);
+    ModelUser? resultUser;
 
-    if (resultUser == null) {
-      return _UserPageStatus(serviceStatus: ServiceStatus.empty);
+    if (user == null) {
+      resultUser = await FirestoreFirebase.getUser(
+          context: context, id: userId ?? AuthFirebase().getUid);
+
+      if (resultUser == null) {
+        return _UserPageStatus(serviceStatus: ServiceStatus.empty);
+      }
+    } else {
+      resultUser = user;
     }
 
     List<ModelItemExperience> items = [];
 
+    List<String> postIds = getPostIds(resultUser);
+
+    List<_ItemToAddLater> itemsToAddLater = [];
+
+    //Here we check if we already got ItemExpreiences so we dont send more request to Firebase
+    //if we alredy got the ItemExperience we get to from Provider
+    for (var i = 0; i < postIds.length; i++) {
+      ModelItemExperience? item =
+          Provider.of<MotelItemExperienceProvider>(context, listen: false)
+              .getModelItemEXperience(postIds[i]);
+
+      if (item != null) {
+        itemsToAddLater.add(_ItemToAddLater(item, i));
+      }
+    }
+
+    for (var i in itemsToAddLater) {
+      postIds.removeWhere((element) => element == i.item!.id);
+    }
+
     if (resultUser.postIds.isNotNullOrEmpty) {
-      items = await FirestoreFirebase.getItemsExperiencesForProfile(
-              getPostIds(resultUser)) ??
-          [];
+      items =
+          await FirestoreFirebase.getItemsExperiencesForProfile(postIds) ?? [];
+    }
+
+    for (var element in itemsToAddLater) {
+      items.insert(element.index!, element.item!);
     }
 
     return _UserPageStatus(
@@ -85,6 +126,8 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
 }
 
 List<String> getPostIds(ModelUser resultUser) {
+  if (resultUser.postIds == null) return [];
+
   if (resultUser.postIds!.length >= 5) {
     return resultUser.postIds?.reversed.toList().sublist(0, 5) ?? [];
   } else {

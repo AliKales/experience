@@ -18,7 +18,7 @@ class ModelAccommandation {
 
   ModelAccommandation.fromJson(Map<String, dynamic> json) {
     type = json['type'];
-    details = json['details'].cast<String>();
+    details = json['details']?.cast<String>();
     price = json['price'];
     instagram = json['instagram'];
     facebook = json['facebook'];

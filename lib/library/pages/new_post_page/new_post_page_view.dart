@@ -112,7 +112,8 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 color: Colors.blue,
                 onTap: () {
                   String? url = modelItemExperience.locationURL;
-                  if (url != null && url.isNotEmpty) Funcs().launchLink(url);
+                  print(url);
+                  if (url.isNotNullOrNoEmpty) Funcs().launchLink(url!);
                 },
               ),
               SimpleUIs().divider(context),

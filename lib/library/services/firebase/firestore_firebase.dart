@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:experiences/library/funcs.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_user.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
-import 'package:experiences/library/services/firebase/storage_firebase.dart';
-import 'package:flutter/cupertino.dart';
 
 class FirestoreFirebase {
   static DocumentSnapshot<Object?>? documentSnapshot;
+  static DocumentSnapshot<Object?>? documentSnapshotUserPage;
 
   //AUTH PART
 
@@ -54,14 +52,32 @@ class FirestoreFirebase {
     if (ids.isEmpty) return null;
     List<ModelItemExperience> list = [];
 
-    var result = await FirebaseFirestore.instance
-        .collection("experiences")
-        .limit(5)
-        .get();
+    QuerySnapshot? result;
+
+    if (FirestoreFirebase.documentSnapshotUserPage == null) {
+      result = await FirebaseFirestore.instance
+          .collection("experiences")
+          .where("id", arrayContainsAny: ids)
+          .limit(5)
+          .get();
+    } else {
+      result = await FirebaseFirestore.instance
+          .collection("experiences")
+          .startAfterDocument(FirestoreFirebase.documentSnapshotUserPage!)
+          .where("id", arrayContainsAny: ids)
+          .limit(5)
+          .get();
+    }
+
     if (result.docs.isEmpty) return null;
 
-    for (var doc in result.docs) {
-      list.add(ModelItemExperience.fromJson(doc.data()));
+    for (var i = 0; i < result.docs.length; i++) {
+      list.add(ModelItemExperience.fromJson(
+          result.docs[i].data() as Map<String, dynamic>));
+
+      if (i == result.docs.length - 1) {
+        FirestoreFirebase.documentSnapshot = result.docs[i];
+      }
     }
 
     return list;
@@ -129,5 +145,25 @@ class FirestoreFirebase {
     }
 
     return listToReturn;
+  }
+
+  static Future<List<ModelUser>> fetchUsersByUsername({
+    required context,
+    required String username,
+  }) async {
+    var result = await FirebaseFirestore.instance
+        .collection("users")
+        .where("username", isGreaterThanOrEqualTo: username)
+        .where("username", isLessThanOrEqualTo: '$username\uf8ff')
+        .limit(3)
+        .get();
+
+    List<ModelUser> results = [];
+
+    for (var element in result.docs) {
+      results.add(ModelUser.fromJson(element.data()));
+    }
+
+    return results;
   }
 }

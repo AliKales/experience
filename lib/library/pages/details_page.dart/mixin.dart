@@ -50,4 +50,8 @@ mixin _Mixin {
 
     SimpleUIs().showSnackBar(context, "Done!");
   }
+
+  void _handleTextClick(context, String url) {
+    Funcs().launchLink(url, context, true);
+  }
 }

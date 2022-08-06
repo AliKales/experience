@@ -8,6 +8,7 @@ import 'package:experiences/library/componets/widget_disable_scroll_glow.dart';
 import 'package:experiences/library/funcs.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_price.dart';
+import 'package:experiences/library/pages/show_photos_page/show_photos_page_view.dart';
 import 'package:experiences/library/pages/user_page/user_page_view.dart';
 import 'package:experiences/library/services/firebase/firestore_firebase.dart';
 import 'package:experiences/library/services/firebase/storage_firebase.dart';
@@ -107,13 +108,29 @@ class _DetailsPageViewState extends State<DetailsPageView>
                     },
                   ),
                 if (widget.item.accommandation?.instagram != null)
-                  ..._smallTextClickable(context, "Instagram", () {}),
+                  ..._smallTextClickable(
+                      context,
+                      "Instagram",
+                      () => _handleTextClick(
+                          context, widget.item.accommandation!.instagram!)),
                 if (widget.item.accommandation?.facebook != null)
-                  ..._smallTextClickable(context, "Facebook", () {}),
+                  ..._smallTextClickable(
+                      context,
+                      "Facebook",
+                      () => _handleTextClick(
+                          context, widget.item.accommandation!.facebook!)),
                 if (widget.item.accommandation?.website != null)
-                  ..._smallTextClickable(context, "Website", () {}),
+                  ..._smallTextClickable(
+                      context,
+                      "Website",
+                      () => _handleTextClick(
+                          context, widget.item.accommandation!.website!)),
                 if (widget.item.accommandation?.locationURL != null)
-                  ..._smallTextClickable(context, "Location", () {}),
+                  ..._smallTextClickable(
+                      context,
+                      "Location",
+                      () => _handleTextClick(
+                          context, widget.item.accommandation!.locationURL!)),
                 if (_checkAccommandationExisting) SimpleUIs().divider(context),
                 if (_checkPricesExisting)
                   Row(
@@ -154,18 +171,28 @@ class _DetailsPageViewState extends State<DetailsPageView>
                   height: context.dynamicHeight(0.01),
                 ),
                 if (_tabController != null)
-                  SizedBox(
-                    width: double.maxFinite,
-                    height: context.dynamicHeight(0.3),
-                    child: PageView.builder(
-                      itemCount: _tabController!.length,
-                      onPageChanged: (val) {
-                        _tabController!.animateTo(val);
-                      },
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: _image(index),
+                  InkWell(
+                    onTap: () {
+                      context.navigateToPage(
+                        ShowPhotosPageView(
+                          photosMemory: widget.photos,
+                          photosUrl: widget.item.photos,
+                        ),
+                      );
+                    },
+                    child: SizedBox(
+                      width: double.maxFinite,
+                      height: context.dynamicHeight(0.3),
+                      child: PageView.builder(
+                        itemCount: _tabController!.length,
+                        onPageChanged: (val) {
+                          _tabController!.animateTo(val);
+                        },
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: _image(index),
+                        ),
                       ),
                     ),
                   ),

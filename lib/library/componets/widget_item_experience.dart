@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
+import 'package:experiences/library/services/hive/hivedatabase.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 import '../values.dart';
+import 'fave_star.dart';
 
 class WidgetItemExperience extends StatelessWidget {
   const WidgetItemExperience({
@@ -50,14 +52,7 @@ class WidgetItemExperience extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (isStarShown!)
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.star_border,
-                      color: Colors.yellow,
-                    ),
-                  ),
+                if (isStarShown!) FaveStar(itemId: item.id!,userId: item.userId!),
               ],
             ),
           ),

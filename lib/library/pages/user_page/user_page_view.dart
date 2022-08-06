@@ -3,17 +3,20 @@ import 'dart:core';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:experiences/library/componets/custom_appbar.dart';
 import 'package:experiences/library/componets/custom_button.dart';
+import 'package:experiences/library/componets/last_widget.dart';
 import 'package:experiences/library/componets/widget_disable_scroll_glow.dart';
 import 'package:experiences/library/componets/widget_item_experience.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_user.dart';
 import 'package:experiences/library/pages/details_page.dart/details_page_view.dart';
+import 'package:experiences/library/providers/item_experiences_provider.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:experiences/library/services/firebase/firestore_firebase.dart';
 import 'package:experiences/library/simple_uis.dart';
 import 'package:experiences/library/values.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+import 'package:provider/provider.dart';
 
 import '../../funcs.dart';
 import '../../services/firebase/storage_firebase.dart';
@@ -22,9 +25,10 @@ import '../loading_page/loading_page_view.dart';
 part 'mixin.dart';
 
 class UserPageView extends StatefulWidget {
-  const UserPageView({Key? key, this.userId}) : super(key: key);
+  const UserPageView({Key? key, this.userId, this.user}) : super(key: key);
 
   final String? userId;
+  final ModelUser? user;
 
   @override
   State<UserPageView> createState() => _UserPageViewState();
@@ -40,7 +44,7 @@ class _UserPageViewState extends State<UserPageView>
     // TODO: implement initState
     super.initState();
 
-    getUserInfos(widget.userId).then((value) {
+    getUserInfos(widget.userId, widget.user).then((value) {
       setState(() {
         _userPageStatus = value;
       });
@@ -144,18 +148,12 @@ class _UserPageViewState extends State<UserPageView>
                     child: ListView.builder(
                       itemCount: _howManyItems,
                       itemBuilder: (context, index) {
-                        return WidgetItemExperience(
-                          isStarShown: false,
-                          item: _userPageStatus.items![index],
-                          onTap: () {
-                            context.navigateToPage(
-                              DetailsPageView(
-                                item: _userPageStatus.items![index],
-                                letGoUserPage: false,
-                              ),
-                            );
-                          },
-                        );
+                        if (index == _length - 1 && _length > 5) {
+                          LastWidget(
+                              onShown: _handleOnshown,
+                              child: _itemExperienceWidget(index, context));
+                        }
+                        return _itemExperienceWidget(index, context);
                       },
                     ),
                   ),
@@ -164,6 +162,26 @@ class _UserPageViewState extends State<UserPageView>
       ),
     );
   }
+
+  WidgetItemExperience _itemExperienceWidget(int index, BuildContext context) {
+    return WidgetItemExperience(
+      isStarShown: _isUserSent(),
+      item: _userPageStatus.items![index],
+      onTap: () async {
+        await context.navigateToPage(
+          DetailsPageView(
+            item: _userPageStatus.items![index],
+            letGoUserPage: false,
+          ),
+        );
+
+        //here we refresh in case of user adding it to favorites
+        setState(() {});
+      },
+    );
+  }
+
+  int get _length => _userPageStatus.items?.length ?? 0;
 
   int get _howManyItems => _userPageStatus.items?.length ?? 0;
 
@@ -247,7 +265,26 @@ class _UserPageViewState extends State<UserPageView>
     }
   }
 
-  bool _isUserSent() => widget.userId != null;
+  bool _isUserSent() => widget.userId != null || widget.user != null;
+
+  void _handleOnshown() async {
+    int howManyItemsLoaded = _userPageStatus.items?.length ?? 0;
+
+    List<String> postIds = _userPageStatus.modelUser?.postIds ?? [];
+
+    if (howManyItemsLoaded + 5 >= postIds.length) {
+      postIds = postIds.sublist(howManyItemsLoaded, howManyItemsLoaded + 5);
+    } else {
+      postIds = postIds.sublist(howManyItemsLoaded);
+    }
+
+    List<ModelItemExperience> list = _userPageStatus.items ?? [];
+    list += await loadMore(postIds);
+
+    _userPageStatus.items = list;
+
+    setState(() {});
+  }
 
   @override
   // TODO: implement wantKeepAlive
