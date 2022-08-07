@@ -142,4 +142,32 @@ class Funcs {
       if (context != null) SimpleUIs().showSnackBar(context, "ERROR!");
     }
   }
+
+  String getTimeWhenShared(DateTime itemDateTime) {
+    DateTime currentDateTime = getGMTDateTimeNow();
+
+    Duration diffrence = currentDateTime.difference(itemDateTime);
+
+    String valToREturn = "";
+
+    if (diffrence.inDays != 0) {
+      if (diffrence.inDays >= 365) {
+        valToREturn = "${diffrence.inDays / 365} years ago";
+      } else if (diffrence.inDays >= 30) {
+        valToREturn = "${diffrence.inDays / 30} months ago";
+      } else {
+        valToREturn = "${diffrence.inDays} days ago";
+      }
+    } else if (diffrence.inHours != 0) {
+      valToREturn = "${diffrence.inHours} hours ago";
+    } else if (diffrence.inMinutes >= 0) {
+      valToREturn = "${diffrence.inMinutes} minutes ago";
+    } else if (diffrence.inSeconds <= 0) {
+      valToREturn = "1 second ago";
+    } else {
+      valToREturn = "${diffrence.inSeconds} seconds ago";
+    }
+
+    return valToREturn;
+  }
 }

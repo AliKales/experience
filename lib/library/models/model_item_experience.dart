@@ -8,7 +8,7 @@ class ModelItemExperience {
   String? createdDate;
   String? title;
   String? description;
-  String? city;
+  String? username;
   String? country;
   String? countryCode;
   String? locationURL;
@@ -24,7 +24,7 @@ class ModelItemExperience {
     this.createdDate,
     this.title,
     this.description,
-    this.city,
+    this.username,
     this.country,
     this.countryCode,
     this.locationURL,
@@ -41,7 +41,7 @@ class ModelItemExperience {
     createdDate = json['createdDate'];
     title = json['title'];
     description = json['description'];
-    city = json['city'];
+    username = json['username'];
     country = json['country'];
     countryCode = json['countryCode'];
     locationURL = json['locationURL'];
@@ -59,7 +59,7 @@ class ModelItemExperience {
     data['createdDate'] = createdDate;
     data['title'] = title;
     data['description'] = description;
-    data['city'] = city;
+    data['username'] = username;
     data['country'] = country;
     data['countryCode'] = countryCode;
     data['locationURL'] = locationURL;

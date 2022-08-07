@@ -7,15 +7,27 @@ mixin _Mixin {
   late String path;
   late ModelItemExperience itemExperience;
 
-  void init(
-    ModelItemExperience i,
-  ) {
+  void init(ModelItemExperience i) {
     path = Funcs().getIdByTime();
     itemExperience = i;
   }
 
   void _handleShare(BuildContext context, List<Uint8List> photos) async {
     SimpleUIs().showProgressIndicator(context);
+
+    ModelUser? user =
+        Provider.of<UserPageProvider>(context, listen: false).getUser;
+
+    if (user == null) {
+      user = await Provider.of<UserPageProvider>(context, listen: false)
+          .setUserFromDB(context);
+    }
+
+    if (user == null) {
+      Navigator.pop(context);
+      SimpleUIs().showSnackBar(context, "Error");
+      return;
+    }
 
     for (var i = 0; i < photos.length; i++) {
       Uint8List element = photos[i];
@@ -36,6 +48,8 @@ mixin _Mixin {
     ).toList();
 
     itemExperience.id = path;
+
+    itemExperience.username = user.username;
 
     itemExperience.createdDate = Funcs().getGMTDateTimeNow().toIso8601String();
 

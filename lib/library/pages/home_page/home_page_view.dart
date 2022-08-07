@@ -44,7 +44,7 @@ class _HomePageViewState extends State<HomePageView>
           if (index == items.length - 1 && items.length > 10) {
             return LastWidget(
                 onShown: () {
-                  print("object");
+                  loadMore();
                 },
                 child: _widgetExperiences(items, index, context));
           }

@@ -22,17 +22,16 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
 
   Future<_UserPageStatus> getUserInfos(
       [String? userId, ModelUser? user]) async {
-    await Future.delayed(const Duration(seconds: 1));
-
     if (!AuthFirebase().isSignedIn && userId.isNullOrEmpty && user == null) {
       return _UserPageStatus(serviceStatus: ServiceStatus.empty);
     }
 
-    ModelUser? resultUser;
+    ModelUser? resultUser =
+        Provider.of<UserPageProvider>(context, listen: false).getUser;
 
     if (user == null) {
-      resultUser = await FirestoreFirebase.getUser(
-          context: context, id: userId ?? AuthFirebase().getUid);
+      resultUser = await Provider.of<UserPageProvider>(context, listen: false)
+          .setUserFromDB(context, userId);
 
       if (resultUser == null) {
         return _UserPageStatus(serviceStatus: ServiceStatus.empty);
@@ -72,6 +71,8 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
       items.insert(element.index!, element.item!);
     }
 
+    print(items);
+
     return _UserPageStatus(
         serviceStatus: ServiceStatus.done, modelUser: resultUser, items: items);
   }
@@ -106,6 +107,7 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
 
   void _logOut(context) async {
     await AuthFirebase().logOut(context);
+    Provider.of<UserPageProvider>(context).resetUser();
     Funcs().navigatorPushReplacement(context, const LoadingPageView());
   }
 

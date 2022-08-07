@@ -21,7 +21,11 @@ mixin _Mixin on State<SearchPageView> {
 
   _handleOnChanded(String val) async {
     List<ModelUser> result = [];
-    if (val != "") result = await search(val);
+    if (val != "") {
+      result = await search(val);
+    } else {
+      _cancelableOperation?.cancel();
+    }
     return result;
   }
 }

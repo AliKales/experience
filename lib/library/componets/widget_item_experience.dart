@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:experiences/library/funcs.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
-import 'package:experiences/library/services/hive/hivedatabase.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
@@ -52,10 +52,19 @@ class WidgetItemExperience extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (isStarShown!) FaveStar(itemId: item.id!,userId: item.userId!),
+                if (isStarShown!)
+                  FaveStar(itemId: item.id!, userId: item.userId!),
               ],
             ),
           ),
+          if (item.username != null)
+            Text(
+              "@${item.username}",
+              style: context.textTheme.headline6!.copyWith(
+                color: cTextColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           Row(
             children: [
               const Spacer(),
@@ -68,6 +77,19 @@ class WidgetItemExperience extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                Funcs().getTimeWhenShared(DateTime.parse(item.createdDate!)),
+                style: context.textTheme.subtitle1!.copyWith(
+                  color: cTextColor,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
           ),
           SizedBox(height: context.dynamicHeight(0.03)),
           const Divider(),

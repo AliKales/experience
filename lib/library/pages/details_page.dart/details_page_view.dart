@@ -8,6 +8,7 @@ import 'package:experiences/library/componets/widget_disable_scroll_glow.dart';
 import 'package:experiences/library/funcs.dart';
 import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_price.dart';
+import 'package:experiences/library/models/model_user.dart';
 import 'package:experiences/library/pages/show_photos_page/show_photos_page_view.dart';
 import 'package:experiences/library/pages/user_page/user_page_view.dart';
 import 'package:experiences/library/services/firebase/firestore_firebase.dart';
@@ -16,6 +17,9 @@ import 'package:experiences/library/simple_uis.dart';
 import 'package:experiences/library/values.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/user_page_provider.dart';
 
 part 'mixin.dart';
 
@@ -82,7 +86,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
                     context,
                     "Location",
                     () {
-                      Funcs().launchLink("url", context, true);
+                      Funcs().launchLink(widget.item.locationURL??"", context, true);
                     },
                   ),
                 SimpleUIs().divider(context),

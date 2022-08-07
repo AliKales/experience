@@ -10,6 +10,7 @@ import 'package:experiences/library/models/model_item_experience.dart';
 import 'package:experiences/library/models/model_user.dart';
 import 'package:experiences/library/pages/details_page.dart/details_page_view.dart';
 import 'package:experiences/library/providers/item_experiences_provider.dart';
+import 'package:experiences/library/providers/user_page_provider.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:experiences/library/services/firebase/firestore_firebase.dart';
 import 'package:experiences/library/simple_uis.dart';

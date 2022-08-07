@@ -54,17 +54,19 @@ class FirestoreFirebase {
 
     QuerySnapshot? result;
 
+    print(ids);
+
     if (FirestoreFirebase.documentSnapshotUserPage == null) {
       result = await FirebaseFirestore.instance
           .collection("experiences")
-          .where("id", arrayContainsAny: ids)
+          .where("id", whereIn: ids)
           .limit(5)
           .get();
     } else {
       result = await FirebaseFirestore.instance
           .collection("experiences")
           .startAfterDocument(FirestoreFirebase.documentSnapshotUserPage!)
-          .where("id", arrayContainsAny: ids)
+          .where("id", whereIn: ids)
           .limit(5)
           .get();
     }
@@ -79,6 +81,8 @@ class FirestoreFirebase {
         FirestoreFirebase.documentSnapshot = result.docs[i];
       }
     }
+
+    print(list);
 
     return list;
   }
@@ -124,11 +128,13 @@ class FirestoreFirebase {
     if (FirestoreFirebase.documentSnapshot == null) {
       result = await FirebaseFirestore.instance
           .collection("experiences")
+          .where('userId', isNotEqualTo: AuthFirebase().getUid)
           .limit(10)
           .get();
     } else {
       result = await FirebaseFirestore.instance
           .collection("experiences")
+          .where('userId', isNotEqualTo: AuthFirebase().getUid)
           .startAfterDocument(FirestoreFirebase.documentSnapshot!)
           .limit(10)
           .get();

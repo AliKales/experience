@@ -2,6 +2,7 @@ import 'package:experiences/library/pages/first_page/first_page_view.dart';
 import 'package:experiences/library/pages/main_page/main_page_view.dart';
 import 'package:experiences/library/providers/bottom_navbar_provider.dart';
 import 'package:experiences/library/providers/item_experiences_provider.dart';
+import 'package:experiences/library/providers/user_page_provider.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:experiences/library/values.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,7 +31,10 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<MotelItemExperienceProvider>(
           create: (context) => MotelItemExperienceProvider(),
-        )
+        ),
+        ChangeNotifierProvider<UserPageProvider>(
+          create: (context) => UserPageProvider(),
+        ),
       ],
       child: const MyApp(),
     ),

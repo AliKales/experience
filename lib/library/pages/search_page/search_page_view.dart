@@ -5,6 +5,7 @@ import 'package:experiences/library/models/model_user.dart';
 import 'package:experiences/library/pages/user_page/user_page_view.dart';
 import 'package:experiences/library/services/firebase/auth_firebase.dart';
 import 'package:experiences/library/services/firebase/firestore_firebase.dart';
+import 'package:experiences/library/simple_uis.dart';
 import 'package:experiences/library/values.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
@@ -23,6 +24,8 @@ class SearchPageView extends StatefulWidget {
 class _SearchPageViewState extends State<SearchPageView> with _Mixin {
   List<ModelUser> searchUsers = [];
 
+  bool isSearching = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,10 +37,22 @@ class _SearchPageViewState extends State<SearchPageView> with _Mixin {
             CustomTextField(
               labelText: "Search",
               onChanged: (val) async {
+                if (val.trim() != "") {
+                  setState(() {
+                    isSearching = true;
+                  });
+                }
                 searchUsers = await _handleOnChanded(val.trim());
-                setState(() {});
+                setState(() {
+                  isSearching = false;
+                });
               },
             ),
+            if (isSearching)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SimpleUIs.progressIndicator(),
+              ),
             Expanded(
               child: WidgetDisableScrollGlow(
                 child: ListView.builder(

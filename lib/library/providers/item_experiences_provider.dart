@@ -11,12 +11,6 @@ class MotelItemExperienceProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addToFollowsPageItems(List<ModelItemExperience> items) {
-    homePageItems += items;
-
-    notifyListeners();
-  }
-
   ModelItemExperience? getModelItemEXperience(String id) {
     return homePageItems.firstWhereOrNull((element) => element.id == id);
   }
