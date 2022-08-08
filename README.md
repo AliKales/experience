@@ -1,16 +1,37 @@
-# experiences
+# Experiences (not sure yet about the name)
 
-A new Flutter project.
+This is a social media app just like Instagram and TikTok
 
-## Getting Started
+## But
 
-This project is a starting point for a Flutter application.
+On this app, users can share their experiences with people.
 
-A few resources to get you started if this is your first Flutter project:
+## Post Details
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+When someone shares a experience/post, there will be some informations about the experience such as;
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+-Description,
+
+-Location,
+
+-Accommandation Infos
+ -Location,
+ -Price,
+ -Type/Kind,
+
+-General Prices
+  -Food,
+  -Transportation
+  -{So on}
+
+-Pictures,
+
+-Country,
+
+-Recomandation(It will show how much user recommands that experience)
+
+## Screenshots
+-Soon
+
+## Video
+-Soon
