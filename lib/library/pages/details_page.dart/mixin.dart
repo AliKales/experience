@@ -18,10 +18,8 @@ mixin _Mixin {
     ModelUser? user =
         Provider.of<UserPageProvider>(context, listen: false).getUser;
 
-    if (user == null) {
-      user = await Provider.of<UserPageProvider>(context, listen: false)
-          .setUserFromDB(context);
-    }
+    user ??= await Provider.of<UserPageProvider>(context, listen: false)
+        .setUserFromDB(context);
 
     if (user == null) {
       Navigator.pop(context);
@@ -60,12 +58,22 @@ mixin _Mixin {
         context: context, experience: itemExperience, path: path);
 
     Navigator.pop(context);
-    Navigator.pop(context);
+    Navigator.pop(context,true);
 
     SimpleUIs().showSnackBar(context, "Done!");
   }
 
   void _handleTextClick(context, String url) {
     Funcs().launchLink(url, context, true);
+  }
+
+  String _calculatePrice(ModelItemExperience item) {
+    double money = 0;
+    for (var element in item.prices ?? []) {
+      if (element.price != null) {
+        money += element.price!;
+      }
+    }
+    return "= ${Funcs().formatMoney(money)}";
   }
 }

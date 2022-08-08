@@ -9,7 +9,6 @@ class LastWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("obje");
     onShown();
     return child;
   }

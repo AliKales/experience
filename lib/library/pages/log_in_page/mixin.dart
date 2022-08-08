@@ -1,6 +1,6 @@
 part of 'log_in_page_view.dart';
 
-mixin _Mixin<T extends StatefulWidget> on State<T> {
+mixin _Mixin<T extends StatefulWidget> on State<LogInPageView> {
   void _onButtonTap(List<TextEditingController> listTECs) async {
     if (!Funcs().checkIfTECsEmpty(listTECs)) {
       SimpleUIs().showSnackBar(context, "Please fill every blank!");

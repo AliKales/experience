@@ -21,13 +21,17 @@ class HomePageView extends StatefulWidget {
 
 class _HomePageViewState extends State<HomePageView>
     with MixinItems, AutomaticKeepAliveClientMixin<HomePageView> {
+  final _textNoItemsLoaded = "No Experience Yet";
+  final _textAppBar = "Home";
+  final _numberOfItemsFromDB = 10;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     List<ModelItemExperience> items =
         Provider.of<MotelItemExperienceProvider>(context).homePageItems;
     return Scaffold(
-      appBar: const CustomAppBar(text: "Home", leadingIcon: Icons.home_filled),
+      appBar: CustomAppBar(text: _textAppBar, leadingIcon: Icons.home_filled),
       body: Padding(
         padding: cPagePadding,
         child:
@@ -41,7 +45,8 @@ class _HomePageViewState extends State<HomePageView>
       child: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
-          if (index == items.length - 1 && items.length > 10) {
+          if (index == items.length - 1 &&
+              items.length > _numberOfItemsFromDB) {
             return LastWidget(
                 onShown: () {
                   loadMore();
@@ -74,7 +79,7 @@ class _HomePageViewState extends State<HomePageView>
         const Spacer(),
         Center(
           child: Text(
-            "No Experience Yet",
+            _textNoItemsLoaded,
             style: context.textTheme.headline6!
                 .copyWith(color: cSecondryColor, fontWeight: FontWeight.bold),
           ),

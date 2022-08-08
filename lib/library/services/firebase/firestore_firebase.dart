@@ -54,8 +54,6 @@ class FirestoreFirebase {
 
     QuerySnapshot? result;
 
-    print(ids);
-
     if (FirestoreFirebase.documentSnapshotUserPage == null) {
       result = await FirebaseFirestore.instance
           .collection("experiences")
@@ -81,8 +79,6 @@ class FirestoreFirebase {
         FirestoreFirebase.documentSnapshot = result.docs[i];
       }
     }
-
-    print(list);
 
     return list;
   }

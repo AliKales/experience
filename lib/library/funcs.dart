@@ -170,4 +170,9 @@ class Funcs {
 
     return valToREturn;
   }
+
+  List<TextEditingController> createTECs(int length) => List.generate(
+        length,
+        (index) => TextEditingController(),
+      );
 }

@@ -23,10 +23,22 @@ class CreateAccountView extends StatefulWidget {
 }
 
 class _CreateAccountViewState extends State<CreateAccountView> with _Mixin {
-  List<TextEditingController> listTECs = List.generate(
-    5,
-    (index) => TextEditingController(),
-  );
+  late List<TextEditingController> listTECs;
+
+  final _createAccountButtonText = "Create Account";
+  final _textFieldZero = "Full Name";
+  final _textFieldsFirst = "Username";
+  final _textFieldSecond = "Email";
+  final _textFieldThird = "Password";
+  final _textFieldFourth = "Confirm Password";
+  final _textHead = "Register";
+  final _textInformation = "Create your new account";
+
+  @override
+  void initState() {
+    super.initState();
+    listTECs = Funcs().createTECs(5);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +52,7 @@ class _CreateAccountViewState extends State<CreateAccountView> with _Mixin {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Text(
-                  "Register",
+                  _textHead,
                   style: context.textTheme.headline4!.copyWith(
                     color: cTextColor,
                     fontWeight: FontWeight.bold,
@@ -50,24 +62,21 @@ class _CreateAccountViewState extends State<CreateAccountView> with _Mixin {
                   height: context.dynamicHeight(0.02),
                 ),
                 Text(
-                  "Create your new account",
+                  _textInformation,
                   style:
                       context.textTheme.headline6!.copyWith(color: cTextColor),
                 ),
                 SizedBox(
                   height: context.dynamicHeight(0.05),
                 ),
-                CustomTextField(labelText: "Full Name", tEC: listTECs[0]),
-                CustomTextField(labelText: "Username", tEC: listTECs[1]),
-                CustomTextField(labelText: "Email", tEC: listTECs[2]),
-                CustomTextField(labelText: "Password", tEC: listTECs[3]),
-                CustomTextField(
-                    labelText: "Confirm Password", tEC: listTECs[4]),
+                CustomTextField(labelText: _textFieldZero, tEC: listTECs[0]),
+                CustomTextField(labelText: _textFieldsFirst, tEC: listTECs[1]),
+                CustomTextField(labelText: _textFieldSecond, tEC: listTECs[2]),
+                CustomTextField(labelText: _textFieldThird, tEC: listTECs[3]),
+                CustomTextField(labelText: _textFieldFourth, tEC: listTECs[4]),
                 CustomButton(
-                  text: "Create Account",
-                  onTap: () {
-                    onButtonClick(listTECs);
-                  },
+                  text: _createAccountButtonText,
+                  onTap: _handleCreateAccount,
                 ),
               ],
             ),
@@ -75,6 +84,10 @@ class _CreateAccountViewState extends State<CreateAccountView> with _Mixin {
         ),
       ),
     );
+  }
+
+  void _handleCreateAccount() {
+    onButtonClick(listTECs);
   }
 
   AppBar _appBar() {

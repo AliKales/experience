@@ -45,6 +45,15 @@ class _DetailsPageViewState extends State<DetailsPageView>
     with SingleTickerProviderStateMixin, _Mixin {
   TabController? _tabController;
 
+  final _bigTextLocation = "Location";
+  final _smallTextClickLocation = "Location";
+  final _bigTextAccomandation = "Accommodation";
+  final _bigTextPrice = "Prices";
+  final _bigTextPhotos = "Photos";
+  final _bigTextReccomand = "Recommend";
+  final _smallTextRecomandation =
+      "How much does the user recommend this experience?";
+
   @override
   void initState() {
     // TODO: implement initState
@@ -52,6 +61,10 @@ class _DetailsPageViewState extends State<DetailsPageView>
 
     if (widget.photos.isNotNullOrEmpty) init(widget.item);
 
+    _handleTabControllers();
+  }
+
+  void _handleTabControllers() {
     if (widget.photos.isNotNullOrEmpty) {
       _tabController =
           TabController(length: widget.photos!.length, vsync: this);
@@ -79,19 +92,20 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 _bigText(context, widget.item.title ?? ""),
                 _smallText(context, widget.item.description ?? ""),
                 SimpleUIs().divider(context),
-                _bigText(context, "Location"),
+                _bigText(context, _bigTextLocation),
                 _smallText(context, widget.item.country ?? ""),
                 if (widget.item.locationURL != null)
                   ..._smallTextClickable(
                     context,
-                    "Location",
+                    _smallTextClickLocation,
                     () {
-                      Funcs().launchLink(widget.item.locationURL??"", context, true);
+                      Funcs().launchLink(
+                          widget.item.locationURL ?? "", context, true);
                     },
                   ),
                 SimpleUIs().divider(context),
                 if (_checkAccommandationExisting)
-                  _bigText(context, "Accommodation"),
+                  _bigText(context, _bigTextAccomandation),
                 if (_checkAccommandationExisting)
                   _priceWidget(
                     context,
@@ -139,7 +153,7 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 if (_checkPricesExisting)
                   Row(
                     children: [
-                      Expanded(child: _bigText(context, "Prices")),
+                      Expanded(child: _bigText(context, _bigTextPrice)),
                       IconButton(
                         onPressed: () {
                           SimpleUIs.showInfoDialog(context: context);
@@ -160,9 +174,9 @@ class _DetailsPageViewState extends State<DetailsPageView>
                 if (_checkPricesExisting)
                   Align(
                       alignment: Alignment.centerRight,
-                      child: _smallText(context, _calculatePrice())),
+                      child: _smallText(context, _calculatePrice(widget.item))),
                 if (_checkPricesExisting) SimpleUIs().divider(context),
-                _bigText(context, "Photos"),
+                _bigText(context, _bigTextPhotos),
                 if (_tabController != null)
                   Align(
                     alignment: Alignment.centerRight,
@@ -201,9 +215,8 @@ class _DetailsPageViewState extends State<DetailsPageView>
                     ),
                   ),
                 SimpleUIs().divider(context),
-                _bigText(context, "Recommend"),
-                _smallText(context,
-                    "How much does the user recommend this experience?"),
+                _bigText(context, _bigTextReccomand),
+                _smallText(context, _smallTextRecomandation),
                 SizedBox(height: context.dynamicHeight(0.02)),
                 PercentIndicator(
                   reccomendation: widget.item.recommendation!,
@@ -328,15 +341,5 @@ class _DetailsPageViewState extends State<DetailsPageView>
       ),
       SizedBox(height: context.dynamicHeight(0.02)),
     ];
-  }
-
-  String _calculatePrice() {
-    double money = 0;
-    for (var element in widget.item.prices ?? []) {
-      if (element.price != null) {
-        money += element.price!;
-      }
-    }
-    return "= ${Funcs().formatMoney(money)}";
   }
 }

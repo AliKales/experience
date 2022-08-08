@@ -71,8 +71,6 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
       items.insert(element.index!, element.item!);
     }
 
-    print(items);
-
     return _UserPageStatus(
         serviceStatus: ServiceStatus.done, modelUser: resultUser, items: items);
   }
@@ -125,14 +123,14 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
 
     return link;
   }
-}
 
-List<String> getPostIds(ModelUser resultUser) {
-  if (resultUser.postIds == null) return [];
+  List<String> getPostIds(ModelUser resultUser) {
+    if (resultUser.postIds == null) return [];
 
-  if (resultUser.postIds!.length >= 5) {
-    return resultUser.postIds?.reversed.toList().sublist(0, 5) ?? [];
-  } else {
-    return resultUser.postIds?.reversed.toList() ?? [];
+    if (resultUser.postIds!.length >= 5) {
+      return resultUser.postIds?.reversed.toList().sublist(0, 5) ?? [];
+    } else {
+      return resultUser.postIds?.reversed.toList() ?? [];
+    }
   }
 }

@@ -18,17 +18,16 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData(
-          iconTheme: const IconThemeData(
-        color: cIconColor,
-      )),
+        iconTheme: const IconThemeData(color: cIconColor, size: 30),
+      ),
       child: Container(
         decoration: const BoxDecoration(
-            border: Border(
-          top: BorderSide(
-            color: cSecondryColor,
-            width: 1,
+          border: Border(
+            top: BorderSide(
+              color: cSecondryColor,
+            ),
           ),
-        )),
+        ),
         width: double.maxFinite,
         height: kBottomNavigationBarHeight,
         child: Row(
@@ -55,7 +54,7 @@ class CustomBottomNavBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: context.dynamicHeight(0.01)),
-            Icon(iconData, size: 30),
+            Icon(iconData),
             SizedBox(height: context.dynamicHeight(0.006)),
             if (itemNumber == selectedPage) _widgetUnderIcon(),
             SizedBox(height: context.dynamicHeight(0.01)),

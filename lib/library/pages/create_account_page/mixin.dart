@@ -46,13 +46,13 @@ mixin _Mixin<T extends StatefulWidget> on State<T> {
       Funcs().navigatorPushReplacement(context, const MainPageView());
     }
   }
-}
 
-String _getUsername(List<TextEditingController> listTECs) =>
-    listTECs[1].text.trim().toLowerCase();
+  String _getUsername(List<TextEditingController> listTECs) =>
+      listTECs[1].text.trim().toLowerCase();
 
-Future<bool> _checkUser(context, List<TextEditingController> listTECs) async {
-  return await FirestoreFirebase.getUser(
-          context: context, username: _getUsername(listTECs)) !=
-      null;
+  Future<bool> _checkUser(context, List<TextEditingController> listTECs) async {
+    return await FirestoreFirebase.getUser(
+            context: context, username: _getUsername(listTECs)) !=
+        null;
+  }
 }

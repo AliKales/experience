@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:experiences/library/componets/custom_button.dart';
 import 'package:experiences/library/componets/custom_dropdown.dart';
 import 'package:experiences/library/componets/custom_radio.dart';
@@ -40,11 +41,35 @@ class _NewPostPageViewState extends State<NewPostPageView>
 
   List<Uint8List> photos = [];
 
+  final _textAppBar = "New Experience";
+  final _textFiedTextTitle = "Title";
+  final _textFiedTextDescription = "Description";
+  final _bigTextLocation = "Location";
+  final _dropDownCountry = "Country";
+  final _textFieldSetLocation = "Set the location";
+  final _buttonCheckLocation = "Check the location";
+  final _bigTextAccomandation = "Accommodation (One Night)";
+  final _dropDownAccomandation = "Type";
+  final _textFieldDetailsAcco = "Details (Wifi,Breakfast...)";
+  final _textFieldAccoPrice = "Price (\$13.40)";
+  final _textFieldInsta = "Instagram Link";
+  final _textFieldFacebook = "Facebook Link";
+  final _textFieldWebsite = "Website Link";
+  final _textFieldAccoLocation = "Location";
+  final _bigTextPrices = "Prices";
+  final _bigTextRecommend = "Recommend";
+  final _smallTextRecommandation =
+      "How much does the user recommend this experience?";
+  final _buttonPreview = "Continue To Preview";
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
+    _loadCountries();
+  }
+
+  void _loadCountries() {
     Funcs().getCountries().then((value) {
       countries = value;
       if (mounted) {
@@ -57,9 +82,9 @@ class _NewPostPageViewState extends State<NewPostPageView>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         leadingIcon: Icons.add,
-        text: "New Experience",
+        text: _textAppBar,
       ),
       body: countries.isEmpty
           ? Center(
@@ -78,46 +103,45 @@ class _NewPostPageViewState extends State<NewPostPageView>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField.outlined(
-                labelText: "Title",
+                labelText: _textFiedTextTitle,
                 onChanged: (value) {
                   modelItemExperience.title = value;
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Description",
+                labelText: _textFiedTextDescription,
                 onChanged: (value) {
                   modelItemExperience.description = value;
                 },
               ),
               SimpleUIs().divider(context),
-              bigText(context, "Location"),
+              bigText(context, _bigTextLocation),
               CustomDropDown(
-                hintText: "Country",
-                items: countries.map((e) => e.name ?? "").toList(),
+                hintText: _dropDownCountry,
+                items: _getCountriesJustNames(),
                 onChanged: (value) {
                   modelItemExperience.country = value;
                   modelItemExperience.countryCode = countries
-                      .firstWhere((element) => element.name == value)
-                      .code;
+                      .firstWhereOrNull((element) => element.name == value)
+                      ?.code;
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Set the location",
+                labelText: _textFieldSetLocation,
                 onChanged: (String value) {
                   modelItemExperience.locationURL = value.trim();
                 },
               ),
               CustomButton.text(
-                text: "Check the location",
+                text: _buttonCheckLocation,
                 color: Colors.blue,
                 onTap: () {
                   String? url = modelItemExperience.locationURL;
-                  print(url);
                   if (url.isNotNullOrNoEmpty) Funcs().launchLink(url!);
                 },
               ),
               SimpleUIs().divider(context),
-              bigText(context, "Accommodation (One Night)"),
+              bigText(context, _bigTextAccomandation),
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
@@ -128,20 +152,20 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 ),
               ),
               CustomDropDown(
-                hintText: "Type",
-                items: Accommodation.values.map((e) => e.name).toList(),
+                hintText: _dropDownAccomandation,
+                items: Accommodation.getAsList(),
                 onChanged: (value) {
                   modelAccommandation.type = value;
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Details (Wifi,Breakfast...)",
+                labelText: _textFieldDetailsAcco,
                 onChanged: (String value) {
                   modelAccommandation.details = value.split(",");
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Price (\$13.40)",
+                labelText: _textFieldAccoPrice,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (String value) {
@@ -149,25 +173,25 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Instagram Link",
+                labelText: _textFieldInsta,
                 onChanged: (String value) {
                   modelAccommandation.instagram = value;
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Facebook Link",
+                labelText: _textFieldFacebook,
                 onChanged: (String value) {
                   modelAccommandation.facebook = value;
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Website Link",
+                labelText: _textFieldWebsite,
                 onChanged: (String value) {
                   modelAccommandation.website = value;
                 },
               ),
               CustomTextField.outlined(
-                labelText: "Location",
+                labelText: _textFieldAccoLocation,
                 onChanged: (String value) {
                   modelAccommandation.locationURL = value;
                 },
@@ -175,7 +199,7 @@ class _NewPostPageViewState extends State<NewPostPageView>
               SimpleUIs().divider(context),
               Row(
                 children: [
-                  Expanded(child: bigText(context, "Prices")),
+                  Expanded(child: bigText(context, _bigTextPrices)),
                   IconButton(
                     onPressed: () {
                       SimpleUIs.showInfoDialog(context: context);
@@ -199,9 +223,8 @@ class _NewPostPageViewState extends State<NewPostPageView>
                 },
               ),
               SimpleUIs().divider(context),
-              bigText(context, "Recommend"),
-              smallText(
-                  context, "How much does the user recommend this experience?"),
+              bigText(context, _bigTextRecommend),
+              smallText(context, _smallTextRecommandation),
               SizedBox(height: context.dynamicHeight(0.02)),
               CustomRadio(
                 onChanged: (value) {
@@ -210,7 +233,7 @@ class _NewPostPageViewState extends State<NewPostPageView>
               ),
               SizedBox(height: context.dynamicHeight(0.05)),
               CustomButton(
-                text: "Continue To Preview",
+                text: _buttonPreview,
                 onTap: _handleContinue,
               ),
             ],
@@ -219,6 +242,9 @@ class _NewPostPageViewState extends State<NewPostPageView>
       ),
     );
   }
+
+  List<String> _getCountriesJustNames() =>
+      countries.map((e) => e.name ?? "").toList();
 
   Widget bigText(BuildContext context, String text) {
     return Column(
@@ -264,7 +290,7 @@ class _NewPostPageViewState extends State<NewPostPageView>
     ];
   }
 
-  void _handleContinue() {
+  void _handleContinue() async {
     if (_isStringEmpty(modelItemExperience.title)) {
       SimpleUIs().showSnackBar(context, "Title can not be empty!");
       return;
@@ -290,13 +316,20 @@ class _NewPostPageViewState extends State<NewPostPageView>
 
     modelItemExperience.userId = AuthFirebase().getUid;
 
-    context.navigateToPage(
+    bool? result = await context.navigateToPage(
       DetailsPageView(
         item: modelItemExperience,
         photos: photos,
         isNewExperience: true,
       ),
     );
+
+    if (result == null || !result) return;
+
+    modelItemExperience = ModelItemExperience();
+    photos.clear();
+    modelAccommandation = ModelAccommandation();
+    setState(() {});
   }
 
   bool _isStringEmpty(String? text) {

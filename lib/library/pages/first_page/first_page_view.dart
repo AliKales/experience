@@ -9,8 +9,6 @@ import 'package:kartal/kartal.dart';
 
 import '../../componets/widget_image.dart';
 
-part 'first_page_mixin.dart';
-
 class FirstPageView extends StatefulWidget {
   const FirstPageView({Key? key}) : super(key: key);
 
@@ -19,8 +17,6 @@ class FirstPageView extends StatefulWidget {
 }
 
 class _FirstPageViewState extends State<FirstPageView> {
-  int pressedButton = -1;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,18 +27,24 @@ class _FirstPageViewState extends State<FirstPageView> {
             alignment: Alignment.center,
             child: Column(
               children: [
+                //Here we show an image, it is just a basic image
                 const WidgetImage(),
                 SizedBox(height: context.dynamicHeight(0.04)),
+                //CustomButton (CREATE ACCOUNT)
                 CustomButton(
                     text: "CREATE ACCOUNT",
                     onTap: () =>
                         context.navigateToPage(const CreateAccountView())),
+
+                //CustomButton (LOG IN)
                 CustomButton.outlined(
                   text: "LOg IN",
                   onTap: () => context.navigateToPage(
                     const LogInPageView(),
                   ),
                 ),
+
+                //CustomButton (SKIP) people who doesnt want to sign up or log in
                 CustomButton.text(
                     text: "SKIP",
                     onTap: () => Funcs().navigatorPushReplacement(

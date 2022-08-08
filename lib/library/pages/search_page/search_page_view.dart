@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
 
 import '../../componets/custom_appbar.dart';
+import 'componets/widget_user_search.dart';
 
 part 'mixin.dart';
 
@@ -26,27 +27,20 @@ class _SearchPageViewState extends State<SearchPageView> with _Mixin {
 
   bool isSearching = false;
 
+  final _textAppBar = "Search";
+  final _textTextField = "Search";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(text: "Search", leadingIcon: Icons.search),
+      appBar: CustomAppBar(text: _textAppBar, leadingIcon: Icons.search),
       body: Padding(
         padding: cPagePadding,
         child: Column(
           children: [
             CustomTextField(
-              labelText: "Search",
-              onChanged: (val) async {
-                if (val.trim() != "") {
-                  setState(() {
-                    isSearching = true;
-                  });
-                }
-                searchUsers = await _handleOnChanded(val.trim());
-                setState(() {
-                  isSearching = false;
-                });
-              },
+              labelText: _textTextField,
+              onChanged: _handleOnChanged,
             ),
             if (isSearching)
               Padding(
@@ -81,52 +75,16 @@ class _SearchPageViewState extends State<SearchPageView> with _Mixin {
       ),
     );
   }
-}
 
-class WidgetUserSearch extends StatelessWidget {
-  const WidgetUserSearch({
-    Key? key,
-    required this.user,
-    this.onTap,
-  }) : super(key: key);
-
-  final ModelUser user;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    const double padding = 10;
-    const double marginVertical = 10;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(padding),
-        margin: const EdgeInsets.symmetric(vertical: marginVertical),
-        width: double.maxFinite,
-        decoration: const BoxDecoration(
-          color: cSecondryColor,
-          borderRadius: BorderRadius.all(
-            Radius.circular(cRadius),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(user.fullName ?? "",
-                    style: context.textTheme.headline6!
-                        .copyWith(fontWeight: FontWeight.bold)),
-                Text("@${user.username}",
-                    style: context.textTheme.subtitle1!
-                        .copyWith(fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const Icon(Icons.arrow_forward_ios),
-          ],
-        ),
-      ),
-    );
+  void _handleOnChanged(val) async {
+    if (val.trim() != "") {
+      setState(() {
+        isSearching = true;
+      });
+    }
+    searchUsers = await _handleOnChanded(val.trim());
+    setState(() {
+      isSearching = false;
+    });
   }
 }

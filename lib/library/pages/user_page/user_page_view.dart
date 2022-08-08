@@ -40,11 +40,20 @@ class _UserPageViewState extends State<UserPageView>
   _UserPageStatus _userPageStatus =
       _UserPageStatus(serviceStatus: ServiceStatus.loading);
 
+  final _numberOfItemsFromDb = 5;
+  final _textAppBar = "User";
+  final _buttonTextWhenNoUser = "LOG IN";
+  var textExpereinces = "Experiences";
+  var textWhenNoExperience = "No Experience Yet";
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
+    _handleUserInfos();
+  }
+
+  void _handleUserInfos() {
     getUserInfos(widget.userId, widget.user).then((value) {
       setState(() {
         _userPageStatus = value;
@@ -55,22 +64,15 @@ class _UserPageViewState extends State<UserPageView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
       appBar: CustomAppBar(
         leadingIcon: Icons.account_circle,
-        text: "User",
+        text: _textAppBar,
         actions: [
           if (!_isUserSent())
             IconButton(
-              onPressed: () {
-                if (_userPageStatus.serviceStatus == ServiceStatus.done) {
-                  _showModalBottomSheet(
-                    (value) {
-                      if (value == 0) _changeProfilePic();
-                    },
-                  );
-                }
-              },
+              onPressed: _handleIconButtonMoreVert,
               icon: const Icon(Icons.more_vert_outlined),
             ),
         ],
@@ -85,7 +87,7 @@ class _UserPageViewState extends State<UserPageView>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CustomButton(
-                          text: "LOG IN",
+                          text: _buttonTextWhenNoUser,
                           onTap: () {
                             Funcs().navigatorPushReplacement(
                               context,
@@ -103,6 +105,16 @@ class _UserPageViewState extends State<UserPageView>
     );
   }
 
+  void _handleIconButtonMoreVert() {
+    if (_userPageStatus.serviceStatus == ServiceStatus.done) {
+      _showModalBottomSheet(
+        (value) {
+          if (value == 0) _changeProfilePic();
+        },
+      );
+    }
+  }
+
   Padding _mainBody(BuildContext context) {
     return Padding(
       padding: cPagePadding,
@@ -115,7 +127,7 @@ class _UserPageViewState extends State<UserPageView>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Experiences",
+                textExpereinces,
                 style: context.textTheme.headline5!
                     .copyWith(fontWeight: FontWeight.bold),
               ),
@@ -134,7 +146,7 @@ class _UserPageViewState extends State<UserPageView>
                       const Spacer(),
                       Center(
                         child: Text(
-                          "No Experience Yet",
+                          textWhenNoExperience,
                           style: context.textTheme.headline6!.copyWith(
                               color: cSecondryColor,
                               fontWeight: FontWeight.bold),
@@ -149,7 +161,8 @@ class _UserPageViewState extends State<UserPageView>
                     child: ListView.builder(
                       itemCount: _howManyItems,
                       itemBuilder: (context, index) {
-                        if (index == _length - 1 && _length > 5) {
+                        if (index == _length - 1 &&
+                            _length > _numberOfItemsFromDb) {
                           LastWidget(
                               onShown: _handleOnshown,
                               child: _itemExperienceWidget(index, context));

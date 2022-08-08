@@ -17,6 +17,18 @@ const cTextFieldColor = Color(0xFFF1F1F1);
 
 const cSearchDelay = Duration(milliseconds: 1500);
 
+const dividerTheme = DividerThemeData(color: cSecondryColor, thickness: 2);
+
+const appBarTheme = AppBarTheme(
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  iconTheme: iconTheme,
+);
+
+const iconTheme = IconThemeData(
+  color: Colors.white,
+);
+
 enum ServiceStatus {
   empty,
   loading,
@@ -29,7 +41,11 @@ enum Accommodation {
   room,
   apartment,
   house,
-  villa,
+  villa;
+
+  static List<String> getAsList() {
+    return Accommodation.values.map((e) => e.name).toList();
+  }
 }
 
 enum Recommendations {

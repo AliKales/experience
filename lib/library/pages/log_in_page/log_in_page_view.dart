@@ -21,10 +21,20 @@ class LogInPageView extends StatefulWidget {
 }
 
 class _LogInPageViewState extends State<LogInPageView> with _Mixin {
-  List<TextEditingController> listTECs = List.generate(
-    2,
-    (index) => TextEditingController(),
-  );
+  late List<TextEditingController> listTECs;
+
+  final _textFieldZero = "Email";
+  final _textFieldFirst = "Password";
+  final _buttonText = "Log In";
+  final _textHead = "Welcome";
+  final _textInformation = "Log into your account";
+
+  @override
+  void initState() {
+    super.initState();
+
+    listTECs = Funcs().createTECs(2);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +46,7 @@ class _LogInPageViewState extends State<LogInPageView> with _Mixin {
         child: Column(
           children: [
             Text(
-              "Welcome",
+              _textHead,
               style: context.textTheme.headline4!.copyWith(
                 color: cTextColor,
                 fontWeight: FontWeight.bold,
@@ -46,19 +56,19 @@ class _LogInPageViewState extends State<LogInPageView> with _Mixin {
               height: context.dynamicHeight(0.02),
             ),
             Text(
-              "Log into your account",
+              _textInformation,
               style: context.textTheme.headline6!.copyWith(color: cTextColor),
             ),
             SizedBox(
               height: context.dynamicHeight(0.05),
             ),
-            CustomTextField(labelText: "Email", tEC: listTECs.first),
-            CustomTextField(labelText: "Password", tEC: listTECs[1]),
+            CustomTextField(labelText: _textFieldZero, tEC: listTECs.first),
+            CustomTextField(labelText: _textFieldFirst, tEC: listTECs[1]),
             SizedBox(height: context.dynamicHeight(0.02)),
             const WidgetImage(boxFit: BoxFit.cover),
             SizedBox(height: context.dynamicHeight(0.02)),
             CustomButton(
-              text: "Log IN",
+              text: _buttonText,
               onTap: () => _onButtonTap(listTECs),
             ),
           ],
